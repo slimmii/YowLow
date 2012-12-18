@@ -1,0 +1,60 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+    <Button
+        android:id="@+id/activity_main_import_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onImportButtonClicked"
+        android:text="@string/activity_main_import_button_text" />
+
+    <Button
+        android:id="@+id/activity_main_random_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onRandomButtonClicked"
+        android:text="@string/activity_main_random_button_text" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+        
+        <TextView 
+            android:id="@+id/activity_main_random_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            />       
+               
+        <ImageView
+            android:id="@+id/activity_main_guest_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+            android:contentDescription=""
+            android:layout_below="@id/activity_main_random_action"
+            android:layout_centerHorizontal="true"
+            android:onClick="onGuestClicked"
+            />
+        
+        <TextView 
+            android:id="@+id/activity_main_guest_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_main_guest_image"
+            android:layout_centerHorizontal="true"
+            />     
+            
+        
+                  
+    </RelativeLayout>
+
+</LinearLayout>
+</ScrollView>
