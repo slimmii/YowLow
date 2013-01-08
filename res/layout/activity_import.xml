@@ -29,11 +29,17 @@
 	     />
 
 	<Button
-	    android:id="@+id/activity_import_random_guest_button"
+	    android:id="@+id/activity_import_clear_button"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:text="@string/activity_import_random_guest_button_text"
-	    android:onClick="onRandomGuestButtonClicked"
-	     />	
+	    android:text="@string/activity_import_clear_button_text"
+	    android:onClick="onClearButtonClicked"
+	     />
+	
+	<ListView 
+	    android:id="@+id/activity_import_imported_guests_list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	></ListView>
 	
 </LinearLayout>
