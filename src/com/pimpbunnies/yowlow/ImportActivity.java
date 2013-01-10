@@ -17,6 +17,8 @@ import com.facebook.FacebookActivity;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.Session.OpenRequest;
+import com.facebook.Session.StatusCallback;
 import com.facebook.SessionState;
 import com.facebook.Request.Callback;
 import com.facebook.widget.LoginButton;
@@ -28,6 +30,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.Menu;
@@ -47,6 +50,26 @@ public class ImportActivity extends FacebookActivity {
   private ProgressDialog fDownloadDialog;
   /** End of list **/
 
+  private List<String> permissions = Arrays.asList("read_friendlists","user_about_me","friends_about_me","user_activities","friends_activities",
+	        "user_birthday","friends_birthday","user_checkins","friends_checkins",
+	        "user_education_history","friends_education_history",
+	        "user_events","friends_events",
+	        "user_groups","friends_groups",
+	        "user_hometown","friends_hometown",
+	        "user_interests","friends_interests",
+	        "user_likes","friends_likes",
+	        "user_location","friends_location",
+	        "user_notes","friends_notes",
+	        "user_photos","friends_photos",
+	        "user_questions","friends_questions",
+	        "user_relationships","friends_relationships",
+	        "user_relationship_details","friends_relationship_details",
+	        "user_religion_politics","friends_religion_politics",
+	        "user_status","friends_status",
+	        "user_subscriptions","friends_subscriptions",
+	        "user_videos","friends_videos",
+	        "user_website","friends_website",
+	        "user_work_history","friends_work_history","email");
 
   private GuestAdapter fGuestAdapter;
   private boolean fFacebookLinkActive = false;
@@ -221,27 +244,36 @@ public class ImportActivity extends FacebookActivity {
     activity_import_import_button = (Button) findViewById(R.id.activity_import_import_button);
     activity_import_guests_list = (ListView) findViewById(R.id.activity_import_imported_guests_list);
 
-    LoginButton authButton = (LoginButton) findViewById(R.id.activity_import_facebook_login);
-    authButton.setReadPermissions(Arrays.asList("read_friendlists","user_about_me","friends_about_me","user_activities","friends_activities",
-        "user_birthday","friends_birthday","user_checkins","friends_checkins",
-        "user_education_history","friends_education_history",
-        "user_events","friends_events",
-        "user_groups","friends_groups",
-        "user_hometown","friends_hometown",
-        "user_interests","friends_interests",
-        "user_likes","friends_likes",
-        "user_location","friends_location",
-        "user_notes","friends_notes",
-        "user_photos","friends_photos",
-        "user_questions","friends_questions",
-        "user_relationships","friends_relationships",
-        "user_relationship_details","friends_relationship_details",
-        "user_religion_politics","friends_religion_politics",
-        "user_status","friends_status",
-        "user_subscriptions","friends_subscriptions",
-        "user_videos","friends_videos",
-        "user_website","friends_website",
-        "user_work_history","friends_work_history","email"));
+
+	Session session = initFacebookSession(this);
+	Session.setActiveSession(session);
+
+	StatusCallback statusCallback = new StatusCallback() {
+		@Override
+		public void call(Session session, SessionState state, Exception exception) {
+			System.out
+					.println(">>>>>>>>>>>>>>>>>>> FacebookImport.open(...).new StatusCallback() {...}.call()");
+			System.out.println(">>>>>>" + state.name());
+			System.out.println(">>>>>>" + session.getAccessToken());
+		}
+	};
+
+	if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
+		System.out.println("Case1");
+		session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback).setPermissions(permissions));
+	} else if (!session.isOpened() && !session.isClosed()) {
+		System.out.println("Case2");
+		OpenRequest req = new Session.OpenRequest(this);
+		req.setCallback(statusCallback);
+		req.setPermissions(permissions);
+		session.openForRead(req);
+	} else {
+		System.out.println("Case3");
+		Session.openActiveSession(this, true, statusCallback);
+	}
+
+    
+    
 
     List<Guest> guests = getGuests();
     fGuestAdapter = new GuestAdapter(this, R.id.activity_import_imported_guests_list, guests);
@@ -254,6 +286,18 @@ public class ImportActivity extends FacebookActivity {
     //    System.out.println(guests);
   }
 
+	private static Session initFacebookSession(Context context) {
+		Session session = Session.getActiveSession();
+		if (session != null) {
+			return session;
+		}
+		if (session == null) {
+			session = new Session(context);
+		}
+		return session;
+	}
+
+  
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
