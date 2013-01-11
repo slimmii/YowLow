@@ -4,10 +4,13 @@ import java.util.List;
 import com.pimpbunnies.yowlow.model.Guest;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class GuestAdapter extends ArrayAdapter<Guest> {
@@ -24,6 +27,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> {
   
   public static class ViewHolder{
     public TextView guest_list_item_name;
+    public ImageView guest_list_item_image;
   }
   
   @Override
@@ -36,6 +40,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> {
         v = vi.inflate(R.layout.guest_list_item, null);
         holder = new ViewHolder();
         holder.guest_list_item_name = (TextView) v.findViewById(R.id.guest_list_item_name);
+        holder.guest_list_item_image = (ImageView) v.findViewById(R.id.guest_list_item_image);
         v.setTag(holder);
     }
     else
@@ -44,6 +49,10 @@ public class GuestAdapter extends ArrayAdapter<Guest> {
     final Guest guest = fGuests.get(position);
     if (guest != null) {
         holder.guest_list_item_name.setText(guest.getName());
+        byte[] byteArray = guest.getPicture();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(guest.getPicture() , 0, guest.getPicture() .length);
+        holder.guest_list_item_image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 64,64, false));
+        
     }
     return v;
   }
