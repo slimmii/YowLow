@@ -2,38 +2,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    tools:context=".MainActivity"
     android:orientation="vertical"
-     >
+    tools:context=".MainActivity" >
 
-	<Button
-	    android:id="@+id/activity_import_import_button"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="@string/activity_import_import_button_text"
-	    android:onClick="onImportButtonClicked"
-	     />
-	
-	<Button
-	    android:id="@+id/activity_import_print_button"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="@string/activity_import_print_button_text"
-	    android:onClick="onPrintButtonClicked"
-	     />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
-	<Button
-	    android:id="@+id/activity_import_clear_button"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="@string/activity_import_clear_button_text"
-	    android:onClick="onClearButtonClicked"
-	     />
-	
-	<ListView 
-	    android:id="@+id/activity_import_imported_guests_list"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	></ListView>
-	
-</LinearLayout>
+        <TextView
+            android:id="@+id/activity_import_facebook_graph_path"
+            android:layout_width="0dp"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:onClick="onImportButtonClicked"
+             />
+
+        <Button
+            android:id="@+id/activity_import_import_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onImportButtonClicked"
+            android:text="@string/activity_import_import_button_text" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/activity_import_save_button"
+            android:layout_width="0dp"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:onClick="onSaveButtonClicked"
+            android:text="@string/activity_import_save_button_text" />
+
+        <Button
+            android:id="@+id/activity_import_clear_button"
+            android:layout_width="0dp"
+            android:layout_weight="1.0"
+            android:layout_height="wrap_content"
+            android:onClick="onClearButtonClicked"
+            android:text="@string/activity_import_clear_button_text" />
+ 	</LinearLayout>
+        <ListView
+            android:id="@+id/activity_import_list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+    </LinearLayout>

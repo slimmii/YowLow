@@ -6,6 +6,7 @@ import com.pimpbunnies.yowlow.model.Guest;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,11 @@ public class GuestAdapter extends ArrayAdapter<Guest> {
         Bitmap bitmap = BitmapFactory.decodeByteArray(guest.getPicture() , 0, guest.getPicture() .length);
         holder.guest_list_item_image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 64,64, false));
         
+    }
+    if (guest.isSelected()) {
+    	v.setBackgroundColor(Color.rgb(188, 217, 255));
+    } else {
+    	v.setBackgroundColor(Color.WHITE);
     }
     return v;
   }

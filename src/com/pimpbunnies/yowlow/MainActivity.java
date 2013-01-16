@@ -1,5 +1,6 @@
 package com.pimpbunnies.yowlow;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -31,8 +32,14 @@ public class MainActivity extends FacebookActivity {
   public void onRandomButtonClicked(View view) {
     BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(MainActivity.this);
     final List<Guest> guests = db.getAllGuests();
+    final List<Guest> selectedGuests = new ArrayList<Guest>();
+    for (Guest guest : guests) {
+    	if (guest.isSelected()) {
+    		selectedGuests.add(guest);
+    	}
+    }
     final Random rand = new Random();
-    final int max = guests.size();
+    final int max = selectedGuests.size();
 
 
     final Handler handler = new Handler();
@@ -41,13 +48,13 @@ public class MainActivity extends FacebookActivity {
       public void run() {
         int randomNum = rand.nextInt(max);
         int randomAction = rand.nextInt(fActions.length);
-        Guest guest = guests.get(randomNum);   
+        Guest guest = selectedGuests.get(randomNum);   
         Bitmap bitmap = BitmapFactory.decodeByteArray(guest.getPicture(), 0, guest.getPicture().length);
 
         fRandomAction.setText(fActions[randomAction]);
         fGuestImage.setImageBitmap(bitmap);
         fGuestName.setText(guest.getName());
-        if (fCounter++ >= 60) {
+        if (fCounter++ >= 30) {
           fCounter = 0;
           fShuffleing = false;
         } else {

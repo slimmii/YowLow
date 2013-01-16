@@ -8,6 +8,7 @@
     <string name="activity_main_import_button_text">Import</string>
     <string name="activity_import_open_session_button_text">Open Session</string>
     <string name="activity_import_print_button_text">Print</string>
+    <string name="activity_import_save_button_text">Save</string>
     <string name="activity_import_random_guest_button_text">Random Guest</string>
     <string name="activity_import_clear_button_text">Clear List</string>
     <string name="app_id">146547195499640</string>

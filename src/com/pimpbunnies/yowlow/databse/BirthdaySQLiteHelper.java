@@ -3,6 +3,7 @@ package com.pimpbunnies.yowlow.databse;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.bool;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -31,13 +32,15 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
   private static final String KEY_ID = "id";
   private static final String KEY_NAME = "name";
   private static final String KEY_PICTURE = "picture";
+  private static final String KEY_SELECTED = "selected";
 
   @Override
   public void onCreate(SQLiteDatabase db) {
     String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_GUESTS + "("
         + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, "
-        + KEY_PICTURE + " BLOB" +
-        ")";
+        + KEY_PICTURE + " BLOB, "
+        + KEY_SELECTED + " INTEGER" 
+        + ")";
     db.execSQL(CREATE_CONTACTS_TABLE);
   }
   
@@ -62,7 +65,8 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
     ContentValues values = new ContentValues();
     values.put(KEY_NAME, guest.getName()); // Guest Name
     values.put(KEY_PICTURE, guest.getPicture()); // Guest Picture
-
+    values.put(KEY_SELECTED, (guest.isSelected()) ? 1 : 0); // Guest Picture
+    
     // Inserting Row
     db.insert(TABLE_GUESTS, null, values);
     db.close(); // Closing database connection
@@ -73,12 +77,12 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
     SQLiteDatabase db = this.getReadableDatabase();
 
     Cursor cursor = db.query(TABLE_GUESTS, new String[] { KEY_ID,
-        KEY_NAME, KEY_PICTURE }, KEY_ID + "=?",
+        KEY_NAME, KEY_PICTURE, KEY_SELECTED }, KEY_ID + "=?",
         new String[] { String.valueOf(id) }, null, null, null, null);
     if (cursor != null)
       cursor.moveToFirst();
     Guest contact = new Guest(Integer.parseInt(cursor.getString(0)),
-        cursor.getString(1));
+        cursor.getString(1), cursor.getInt(2)!=0);
     db.close();
     return contact;
   }
@@ -108,6 +112,7 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
         guest.setId(Integer.parseInt(cursor.getString(0)));
         guest.setName(cursor.getString(1));
         guest.setPicture(cursor.getBlob(2));
+        guest.setSelected(cursor.getInt(3)!=0);
         // Adding contact to list
         guestList.add(guest);
       } while (cursor.moveToNext());
