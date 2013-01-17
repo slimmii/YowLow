@@ -97,6 +97,34 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
     return cursor.getCount();
   }
 
+  public List<Guest> getAllSelectedGuests() {
+	    List<Guest> guestList = new ArrayList<Guest>();
+	    // Select All Query
+	    String selectQuery = "SELECT  * FROM " + TABLE_GUESTS +
+	    		" WHERE " + KEY_SELECTED + "='1'";
+
+	    SQLiteDatabase db = this.getWritableDatabase();
+	    Cursor cursor = db.rawQuery(selectQuery, null);
+
+	    // looping through all rows and adding to list
+	    if (cursor.moveToFirst()) {
+	      do {
+	        Guest guest = new Guest();
+	        guest.setId(Integer.parseInt(cursor.getString(0)));
+	        guest.setName(cursor.getString(1));
+	        guest.setPicture(cursor.getBlob(2));
+	        guest.setSelected(cursor.getInt(3)!=0);
+	        // Adding contact to list
+	        guestList.add(guest);
+	      } while (cursor.moveToNext());
+	    }
+
+	    db.close();
+	    
+	    // return contact list
+	    return guestList;
+	  }
+  
   public List<Guest> getAllGuests() {
     List<Guest> guestList = new ArrayList<Guest>();
     // Select All Query

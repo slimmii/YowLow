@@ -10,12 +10,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <TextView
+        <EditText
             android:id="@+id/activity_import_facebook_graph_path"
             android:layout_width="0dp"
             android:layout_weight="1.0"
             android:layout_height="wrap_content"
-            android:onClick="onImportButtonClicked"
+            android:inputType="text"
              />
 
         <Button

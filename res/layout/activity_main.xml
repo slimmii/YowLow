@@ -27,12 +27,14 @@
         android:layout_height="fill_parent"
         >
         
-        <TextView 
+        <EditText 
             android:id="@+id/activity_main_random_action"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            />       
+            android:inputType="text"
+            android:hint="Type your random Yolo action here!"
+            />
                
         <ImageView
             android:id="@+id/activity_main_guest_image"
@@ -52,7 +54,15 @@
             android:layout_centerHorizontal="true"
             />     
             
-        
+        <Button 
+            android:id="@+id/activity_main_share_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_main_guest_name"
+            android:onClick="onShareClicked"
+            android:text="Share"
+            style="@color/com_facebook_blue"
+            />
                   
     </RelativeLayout>
 
