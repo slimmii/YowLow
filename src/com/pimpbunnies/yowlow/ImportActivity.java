@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +45,7 @@ public class ImportActivity extends FacebookActivity {
 	private Button activity_import_import_button;
 	private Button activity_import_open_session_button;
 	private Button activity_import_clear_button;
-	private TextView activity_import_facebook_graph_path;
+	private EditText activity_import_facebook_graph_path;
 
 
 	private ListView activity_import_list;
@@ -233,8 +234,8 @@ public class ImportActivity extends FacebookActivity {
 
 		activity_import_import_button = (Button) findViewById(R.id.activity_import_import_button);
 		activity_import_list = (ListView) findViewById(R.id.activity_import_list);
-		activity_import_facebook_graph_path = (TextView) findViewById(R.id.activity_import_facebook_graph_path);
-		activity_import_facebook_graph_path.setText("/me/friends");
+		activity_import_facebook_graph_path = (EditText) findViewById(R.id.activity_import_facebook_graph_path);
+		activity_import_facebook_graph_path.setText("/543424479010541/invited");
 		
 		Session session = initFacebookSession(this);
 		Session.setActiveSession(session);
