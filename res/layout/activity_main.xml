@@ -1,70 +1,102 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<LinearLayout xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity" >
+    android:layout_height="fill_parent" 
+    android:background="@drawable/app_background"
+    xmlns:app="http://schemas.android.com/apk/res/com.pimpbunnies.yowlow">
 
-    <Button
-        android:id="@+id/activity_main_import_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onImportButtonClicked"
-        android:text="@string/activity_main_import_button_text" />
-
-    <Button
-        android:id="@+id/activity_main_random_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onRandomButtonClicked"
-        android:text="@string/activity_main_random_button_text" />
-
-    <RelativeLayout
+    <LinearLayout
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        >
-        
-        <EditText 
-            android:id="@+id/activity_main_random_action"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:inputType="text"
-            android:hint="Type your random Yolo action here!"
-            />
-               
-        <ImageView
-            android:id="@+id/activity_main_guest_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" 
-            android:contentDescription=""
-            android:layout_below="@id/activity_main_random_action"
-            android:layout_centerHorizontal="true"
-            android:onClick="onGuestClicked"
-            />
-        
-        <TextView 
-            android:id="@+id/activity_main_guest_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/activity_main_guest_image"
-            android:layout_centerHorizontal="true"
-            />     
-            
-        <Button 
-            android:id="@+id/activity_main_share_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/activity_main_guest_name"
-            android:onClick="onShareClicked"
-            android:text="Share"
-            style="@color/com_facebook_blue"
-            />
-                  
-    </RelativeLayout>
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        tools:context=".MainActivity" >
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:orientation="horizontal" >
+
+<!--             <Button -->
+<!--                 android:id="@+id/activity_main_import_button" -->
+<!--                 android:layout_width="fill_parent" -->
+<!--                 android:layout_height="wrap_content" -->
+<!--                 android:layout_weight="1.0" -->
+<!--             	android:paddingLeft="5dp" -->
+<!--             	android:paddingRight="5dp" -->
+<!--             	android:paddingTop="7dp" -->
+<!--             	android:paddingBottom="7dp" -->
+<!--                 android:onClick="onImportButtonClicked" -->
+<!--                 android:background="@drawable/button_background" -->
+<!--                 android:text="@string/activity_main_import_button_text" /> -->
+   
+            <Button
+                android:id="@+id/activity_main_roll_all_dice"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+            	android:paddingLeft="5dp"
+            	android:paddingRight="5dp"
+            	android:paddingTop="7dp"
+            	android:paddingBottom="7dp"      
+            	android:layout_margin="5dp"          
+                android:onClick="onRollAllDice"
+                android:background="@drawable/button_background"
+                android:text="@string/activity_main_roll_all_dice_text" />   
+            
+            <Button
+                android:id="@+id/activity_main_add_dice"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:layout_margin="5dp"
+            	android:paddingLeft="5dp"
+            	android:paddingRight="5dp"
+            	android:paddingTop="7dp"
+            	android:paddingBottom="7dp"                
+                android:onClick="onAddDiceClicked"
+                android:background="@drawable/button_background"
+                android:text="@string/activity_main_add_dice_text" />
+        </LinearLayout>
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/activity_main_dice_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			app:columnCount="2"
+            android:padding="5dp" >
+            
+        </android.support.v7.widget.GridLayout>
+        
+<!--         <Button -->
+<!--             android:id="@+id/activity_main_random_button" -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_weight="1.0" -->
+<!--             android:onClick="onRandomButtonClicked" -->
+<!--             android:text="@string/activity_main_random_button_text" /> -->
+
+<!--         <LinearLayout -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="fill_parent" > -->
+
+<!--             <ImageView -->
+<!--                 android:id="@+id/activity_main_guest_image" -->
+<!--                 android:layout_width="wrap_content" -->
+<!--                 android:layout_height="wrap_content" -->
+<!--                 android:contentDescription="" -->
+<!--                 android:onClick="onGuestClicked" /> -->
+
+<!--             <TextView -->
+<!--                 android:id="@+id/activity_main_guest_name" -->
+<!--                 android:layout_width="wrap_content" -->
+<!--                 android:layout_height="wrap_content" -->
+<!--                 android:layout_below="@id/activity_main_guest_image" -->
+<!--                 android:layout_centerHorizontal="true" /> -->
+<!--         </LinearLayout> -->
+    </LinearLayout>
+
 </ScrollView>
