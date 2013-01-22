@@ -75,6 +75,31 @@ public class Guest {
 
 		bitmap.compress(CompressFormat.PNG, 0, outputStream);
 		return outputStream.toByteArray();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Guest other = (Guest) obj;
+		if (fName == null) {
+			if (other.fName != null)
+				return false;
+		} else if (!fName.equals(other.fName))
+			return false;
+		return true;
 	} 
 
 

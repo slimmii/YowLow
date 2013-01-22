@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.VoicemailContract;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -51,6 +52,7 @@ public class ImportActivity extends FacebookActivity {
 	private ListView activity_import_list;
 	private ProgressDialog fImportDialog;
 	private ProgressDialog fDownloadDialog;
+	private ProgressDialog fSaveDialog;
 	/** End of list **/
 
 
@@ -83,12 +85,11 @@ public class ImportActivity extends FacebookActivity {
 
 	public void onSaveButtonClicked(View view) {
 		System.out.println("ImportActivity.onSaveButtonClicked()");
-		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(ImportActivity.this);
-		db.flush();
-		for (Guest guest : guests) {
-			db.addGuest(guest);
-		}
-		db.close();
+		
+		Guest[] array = new Guest[guests.size()];
+		array = guests.toArray(array);
+		new SaveOperation().execute(array);
+
 	}
 
 	public List<Guest> getGuests() {
@@ -162,6 +163,40 @@ public class ImportActivity extends FacebookActivity {
 			//Request.executeBatchAsync(request);      
 		} else {
 			System.out.println("NO SESSION YET");
+		}
+	}
+	
+	private class SaveOperation extends AsyncTask<Guest, Void, Void> {
+		private BirthdaySQLiteHelper fDb;
+		
+		public SaveOperation() {	
+			fDb = new BirthdaySQLiteHelper(ImportActivity.this);
+
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			fSaveDialog = new ProgressDialog(ImportActivity.this);
+			fSaveDialog.setMessage("Saving...");
+			fSaveDialog.setCancelable(false);
+			fSaveDialog.show();      
+			fDb.flush();
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			fDb.close();
+			fSaveDialog.dismiss();
+		}
+		
+		@Override
+		protected Void doInBackground(Guest... params) {
+			for (int i=0;i<params.length;i++) {
+				fDb.addGuest(params[i]);
+			}
+			return null;
 		}
 	}
 

@@ -1,4 +1,4 @@
-package com.pimpbunnies.yowlow;
+package com.pimpbunnies.yowlow.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;

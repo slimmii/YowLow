@@ -1,6 +1,9 @@
-package com.pimpbunnies.yowlow;
+package com.pimpbunnies.yowlow.views;
 
+import java.util.ArrayList;
 import java.util.Random;
+
+import com.pimpbunnies.yowlow.model.Guest;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,7 +14,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.view.View;
 
-public class RealDieView extends GenericDieView {
+public class RealDieView extends GenericDieView<Integer> {
 	
 	private int fCounter = 0;
 	private int fCurrentNumber = 6;
@@ -32,9 +35,13 @@ public class RealDieView extends GenericDieView {
 		this.setOnClickListener(onClickListener);
 	}
 
-
 	@Override
-	public void shuffle() {
+	public Integer shuffle(final ShuffleCallback cb) {
+		return shuffle(new ArrayList<Integer>(), cb);
+	}
+	
+	@Override
+	public Integer shuffle(ArrayList<Integer> ignore, final ShuffleCallback cb) {
 		final Handler handler = new Handler();
 		final Random rand = new Random();
 		fShuffleing = true;
@@ -48,12 +55,14 @@ public class RealDieView extends GenericDieView {
 				if (fCounter++ >= 20) {
 					fCounter = 0;
 					fShuffleing = false;
+					
+					cb.shuffled();
 				} else {
 					handler.postDelayed(this, 200);
 				}
 			}
 		}, 0);
-		
+		return 0;
 	}
 	
 	@Override
@@ -95,6 +104,4 @@ public class RealDieView extends GenericDieView {
 		}
 		
 	}
-	
-
 }
