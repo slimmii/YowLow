@@ -102,7 +102,10 @@ public class Guest {
 		return true;
 	} 
 
-
+	@Override
+	public String toString() {
+		return fName;
+	}
 
 
 }

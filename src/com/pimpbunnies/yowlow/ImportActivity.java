@@ -19,6 +19,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.VoicemailContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,7 +49,7 @@ public class ImportActivity extends FacebookActivity {
 	private Button activity_import_open_session_button;
 	private Button activity_import_clear_button;
 	private EditText activity_import_facebook_graph_path;
-
+	private EditText activity_import_search_edittext;
 
 	private ListView activity_import_list;
 	private ProgressDialog fImportDialog;
@@ -57,7 +59,6 @@ public class ImportActivity extends FacebookActivity {
 
 
 	private List<Guest> guests = new ArrayList<Guest>();
-	private GuestAdapter guestAdapter;
 
 	private List<String> permissions = Arrays.asList("read_friendlists","user_about_me","friends_about_me","user_activities","friends_activities",
 			"user_birthday","friends_birthday","user_checkins","friends_checkins",
@@ -258,17 +259,38 @@ public class ImportActivity extends FacebookActivity {
 					return lhs.getName().compareTo(rhs.getName());
 				}
 			});
-			guestAdapter.notifyDataSetChanged();
+			fGuestAdapter.notifyDataSetChanged();
 		}
 	}
+	
+	TextWatcher searchTextWatcher = new TextWatcher() {
+	    @Override
+	    public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+	    	
+	    	System.out.println("Filtering " + arg0);
+	        ImportActivity.this.fGuestAdapter.getFilter().filter(arg0);
+	    }
+
+	    @Override
+	    public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+	            int arg3) {
+	    }
+
+		@Override
+		public void afterTextChanged(Editable s) {
+		}
+	};
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_import);
-
+		activity_import_search_edittext = (EditText) findViewById(R.id.activity_import_search_edittext);
+		activity_import_search_edittext.addTextChangedListener(searchTextWatcher);
+		
 		activity_import_import_button = (Button) findViewById(R.id.activity_import_import_button);
-		activity_import_list = (ListView) findViewById(R.id.activity_import_list);
+		activity_import_list = (ListView) findViewById(R.id.activity_import_list);		
 		activity_import_facebook_graph_path = (EditText) findViewById(R.id.activity_import_facebook_graph_path);
 		activity_import_facebook_graph_path.setText("/543424479010541/invited");
 		
@@ -302,17 +324,17 @@ public class ImportActivity extends FacebookActivity {
 		
 		guests = getGuests();
 		
-		guestAdapter = new GuestAdapter(this, R.layout.guest_list_item, guests);
-		activity_import_list.setAdapter(guestAdapter);
+		fGuestAdapter = new GuestAdapter(this, R.layout.guest_list_item, guests);
+		activity_import_list.setAdapter(fGuestAdapter);
 		activity_import_list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				System.out
 						.println("ImportActivity.onCreate(...).new OnItemClickListener() {...}.onItemClick()" + arg2);
-				Guest selectedGuest = guestAdapter.getItem(arg2);
+				Guest selectedGuest = fGuestAdapter.getItem(arg2);
 				selectedGuest.setSelected(!selectedGuest.isSelected());
-				guestAdapter.notifyDataSetChanged();
+				fGuestAdapter.notifyDataSetChanged();
 			}
 			
 		});
