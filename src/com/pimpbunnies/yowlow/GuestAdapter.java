@@ -29,7 +29,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 			List<Guest> guests) {
 		super(context, viewResourceId, guests);
 		fContext = context;
-		fOrigionalValues = new ArrayList<Guest>(guests);
+		fOrigionalValues = guests;
 		fObjects = new ArrayList<Guest>(guests);
 	}
 
@@ -78,6 +78,13 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 	@Override
 	public void add(Guest object) {
 		fOrigionalValues.add(object);
+		this.notifyDataSetChanged();
+	}
+	
+	public void addAll(List<Guest> guests) {
+		for (Guest guest : guests) {
+			fOrigionalValues.add(guest);
+		}
 		this.notifyDataSetChanged();
 	}
 
