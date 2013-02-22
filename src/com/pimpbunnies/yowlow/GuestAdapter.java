@@ -24,6 +24,15 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 	private List<Guest> fOrigionalValues;
 	private List<Guest> fObjects;
 	private Filter fFilter;
+	private String mFilterString;
+
+	public String getFilterString() {
+		return mFilterString;
+	}
+
+	public void setFilterString(String filterString) {
+		this.mFilterString = filterString;
+	}
 
 	public GuestAdapter(Context context, int viewResourceId,
 			List<Guest> guests) {
@@ -103,6 +112,15 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 			fFilter = new CustomFilter();
 		}
 		return fFilter;
+	}
+	
+	public void filter(String string) {
+		mFilterString = string;
+		filter();
+	}
+	
+	public void filter() {
+		getFilter().filter(mFilterString);
 	}
 
 	private class CustomFilter extends Filter {

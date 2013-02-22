@@ -54,7 +54,6 @@ public class ImportActivity extends FacebookActivity {
 	private ProgressDialog fSaveDialog;
 	/** End of list **/
 
-
 	private List<Guest> guests = new ArrayList<Guest>();
 
 	private List<String> permissions = Arrays.asList("read_friendlists","user_about_me","friends_about_me","user_activities","friends_activities",
@@ -103,6 +102,7 @@ public class ImportActivity extends FacebookActivity {
 		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(ImportActivity.this);
 		db.flush();
 		guests.clear();
+		fGuestAdapter.filter();
 	}
 
 	public void onImportButtonClicked(View view) {
@@ -111,8 +111,6 @@ public class ImportActivity extends FacebookActivity {
 			Session session = Session.getActiveSession();
 			System.out.println(session.getPermissions());
 			System.out.println(session.getAccessToken());
-
-			guests.clear();
 			
 			fImportDialog = new ProgressDialog(ImportActivity.this);
 			fImportDialog.setMessage("Executing Request...");
@@ -258,15 +256,15 @@ public class ImportActivity extends FacebookActivity {
 				}
 			});
 			fGuestAdapter.notifyDataSetChanged();
+			fGuestAdapter.filter();
 		}
 	}
 	
 	TextWatcher searchTextWatcher = new TextWatcher() {
 	    @Override
-	    public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-	    	
+	    public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {	    	
 	    	System.out.println("Filtering " + arg0);
-	        ImportActivity.this.fGuestAdapter.getFilter().filter(arg0);
+	    	fGuestAdapter.filter(arg0.toString());
 	    }
 
 	    @Override
