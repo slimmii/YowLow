@@ -14,7 +14,7 @@
         android:id="@+id/guest_list_item_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/com_facebook_close"
+        android:src="@drawable/ic_missing_person"
          />
 
     <TextView

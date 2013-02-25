@@ -27,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.FacebookActivity;
@@ -39,6 +40,7 @@ import com.facebook.Session.StatusCallback;
 import com.facebook.SessionState;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.util.GuestImageList;
 
 public class ImportActivity extends FacebookActivity {
 
@@ -46,14 +48,17 @@ public class ImportActivity extends FacebookActivity {
 	private Button activity_import_import_button;
 	private Button activity_import_open_session_button;
 	private Button activity_import_clear_button;
+	private Button activity_import_save_button;
 	private EditText activity_import_search_edittext;
 
 	private ListView activity_import_list;
 	private ProgressDialog fImportDialog;
-	private ProgressDialog fDownloadDialog;
+	private ProgressBar fDownloadProgressBar;
 	private ProgressDialog fSaveDialog;
 	/** End of list **/
 
+	private boolean mImporting = false;
+	
 	private List<Guest> guests = new ArrayList<Guest>();
 
 	private List<String> permissions = Arrays.asList("read_friendlists","user_about_me","friends_about_me","user_activities","friends_activities",
@@ -103,6 +108,7 @@ public class ImportActivity extends FacebookActivity {
 		db.flush();
 		guests.clear();
 		fGuestAdapter.filter();
+		
 	}
 
 	public void onImportButtonClicked(View view) {
@@ -116,15 +122,19 @@ public class ImportActivity extends FacebookActivity {
 			fImportDialog.setMessage("Executing Request...");
 			fImportDialog.setCancelable(false);
 			fImportDialog.show();
+			
+			guests.clear();
+			
+			activity_import_save_button.setEnabled(false);
 
 			// make request to the /me API
-			Request.executeGraphPathRequestAsync(session, "/468812496507642/attending",
+			Request.executeGraphPathRequestAsync(session, "/me/friends",
 					new Callback() {
 				@Override
 				public void onCompleted(Response response) {
 					fImportDialog.dismiss();
 					try {
-
+						mImporting = true;
 						JSONObject obj = response.getGraphObject().getInnerJSONObject();
 						List<String> list = new ArrayList<String>();
 						JSONArray array;
@@ -132,24 +142,30 @@ public class ImportActivity extends FacebookActivity {
 
 						// Stage 1 - Prepare
 						// 1. Convert JSON Array to ArrayList of Guests and
-						// 2. Also prepare an array of download requests for images.
-						DownloadRequest[] requests = new DownloadRequest[array.length()];
 						try {
 							for(int i = 0 ; i < array.length() ; i++){
 								String id = array.getJSONObject(i).getString("id");
 								String name = array.getJSONObject(i).getString("name");
-								Guest guest = new Guest(0, name, false);
+								Guest guest = new Guest(0, name, "facebook://" + id, false);
 								guests.add(guest);
 								System.out.println(guest.getName() + " added!");
-								requests[i] = new DownloadRequest(id, guest);
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();
 						}
-
-						// Stage 2 - We now want to asynchronously download the profile images of the guests
-						new DownloadImageOperation(guests.size()).execute(requests);
-
+						
+						// Stage 2 - Sorting both lists the same way.
+						Collections.sort(guests, new Comparator<Guest>() {
+							@Override
+							public int compare(Guest lhs, Guest rhs) {
+								return lhs.getName().compareTo(rhs.getName());
+							}
+						});
+			
+						fGuestAdapter.notifyDataSetChanged();
+						fGuestAdapter.filter();
+						
+						new DownloadImageOperation(true, guests.size()).execute(guests.toArray(new Guest[guests.size()]));
 
 						//new CreateGuestsOperation().execute(array);
 					} catch (JSONException e) {
@@ -158,6 +174,7 @@ public class ImportActivity extends FacebookActivity {
 				}
 			});
 			//Request.executeBatchAsync(request);      
+
 		} else {
 			System.out.println("NO SESSION YET");
 		}
@@ -197,21 +214,27 @@ public class ImportActivity extends FacebookActivity {
 		}
 	}
 
-	private class DownloadImageOperation extends AsyncTask<DownloadRequest, Bitmap, List<Bitmap>> {
-		private int requests;
+	private class DownloadImageOperation extends AsyncTask<Guest, Bitmap, List<Bitmap>> {
+		private int mRequests;
+		private boolean mLowQuality;
 
-		public DownloadImageOperation(int i) {
-			this.requests = i;
+		public DownloadImageOperation(boolean lowQuality, int i) {
+			this.mRequests = i;
+			mLowQuality = lowQuality;
 		}
 
 		@Override
-		protected List<Bitmap> doInBackground(DownloadRequest... requests) {
+		protected List<Bitmap> doInBackground(Guest... requests) {
 			List<Bitmap> bitmaps = new ArrayList<Bitmap>(); 
-			for (DownloadRequest request : requests) {
-				String pictureUrl = "http://graph.facebook.com/" + request.getId() + "/picture?type=large";
-				Bitmap bm = getBitmapFromURL(pictureUrl);
-				request.getGuest().setPicture(bm);
-				publishProgress(bm);
+			for (Guest request : requests) {
+				
+				if (request.getPictureSource().startsWith("facebook://")) {
+					String facebookId = request.getPictureSource().replace("facebook://", "");
+					String pictureUrl = "http://graph.facebook.com/" + facebookId + "/picture?type=" + (mLowQuality?"small":"large");
+					Bitmap bm = getBitmapFromURL(pictureUrl);
+					request.setPicture(bm);
+					publishProgress(bm);
+				}
 			}
 			return bitmaps;
 		}    
@@ -229,34 +252,23 @@ public class ImportActivity extends FacebookActivity {
 		@Override
 		protected void onProgressUpdate(Bitmap... values) {
 			super.onProgressUpdate(values);
-			fDownloadDialog.incrementProgressBy(1);
+			fGuestAdapter.notifyDataSetChanged();
+			fDownloadProgressBar.incrementProgressBy(1);
 		}
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			System.out.println(">>>>>>>>>>>>>>PREEXECUTE!");
-			fDownloadDialog = new ProgressDialog(ImportActivity.this);
-			fDownloadDialog.setMessage("Downloading Images");
-			fDownloadDialog.setCancelable(false);
-			fDownloadDialog.setMax(requests);
-			fDownloadDialog.setProgress(0);
-			fDownloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			fDownloadDialog.show();        
+			fDownloadProgressBar.setMax(mRequests);
+			fDownloadProgressBar.setProgress(0);
+ 
 		}
 
 		@Override
 		protected void onPostExecute(List<Bitmap> bitmaps) {
 			super.onPostExecute(bitmaps); 
-			fDownloadDialog.dismiss();
-			Collections.sort(guests, new Comparator<Guest>() {
-				@Override
-				public int compare(Guest lhs, Guest rhs) {
-					return lhs.getName().compareTo(rhs.getName());
-				}
-			});
-			fGuestAdapter.notifyDataSetChanged();
-			fGuestAdapter.filter();
+			activity_import_save_button.setEnabled(true);
 		}
 	}
 	
@@ -282,11 +294,14 @@ public class ImportActivity extends FacebookActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_import);
+		
 		activity_import_search_edittext = (EditText) findViewById(R.id.activity_import_search_edittext);
 		activity_import_search_edittext.addTextChangedListener(searchTextWatcher);
-		
+		activity_import_save_button = (Button) findViewById(R.id.activity_import_save_button);
 		activity_import_import_button = (Button) findViewById(R.id.activity_import_import_button);
 		activity_import_list = (ListView) findViewById(R.id.activity_import_list);		
+		
+		fDownloadProgressBar = (ProgressBar) findViewById(R.id.activity_import_progress);
 		
 		Session session = initFacebookSession(this);
 		Session.setActiveSession(session);
@@ -328,10 +343,22 @@ public class ImportActivity extends FacebookActivity {
 						.println("ImportActivity.onCreate(...).new OnItemClickListener() {...}.onItemClick()" + arg2);
 				Guest selectedGuest = fGuestAdapter.getItem(arg2);
 				selectedGuest.setSelected(!selectedGuest.isSelected());
+				
+				
+				if (selectedGuest.isSelected()) {
+				// Stage 3 - We now want to asynchronously download the profile images of the guests
+				new DownloadImageOperation(false, 1).execute(new Guest[] {selectedGuest});
+
+				}
+
+				
+				
 				fGuestAdapter.notifyDataSetChanged();
 			}
 			
 		});
+		
+		
 		//    
 		//    BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(this);
 		//    db.addGuest(new Guest(0, "Andie Similon", BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher)));

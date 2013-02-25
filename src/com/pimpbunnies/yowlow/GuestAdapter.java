@@ -16,6 +16,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.android.Facebook;
 import com.pimpbunnies.yowlow.model.Guest;
 
 public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
@@ -67,8 +68,13 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		if (guest != null) {
 			holder.guest_list_item_name.setText(guest.getName());
 			byte[] byteArray = guest.getPicture();
-			Bitmap bitmap = BitmapFactory.decodeByteArray(guest.getPicture() , 0, guest.getPicture() .length);
-			holder.guest_list_item_image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 64,64, false));
+			
+			if (byteArray != null) {
+				Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
+				holder.guest_list_item_image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 64,64, false));
+			} else {
+				holder.guest_list_item_image.setImageResource(R.drawable.ic_missing_person);
+			}
 
 		}
 		if (guest.isSelected()) {

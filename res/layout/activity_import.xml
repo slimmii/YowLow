@@ -26,28 +26,38 @@
         <Button
             android:id="@+id/activity_import_save_button"
             android:layout_width="0dp"
-            android:layout_weight="1.0"
             android:layout_height="wrap_content"
+            android:layout_weight="1.0"
             android:onClick="onSaveButtonClicked"
             android:text="@string/activity_import_save_button_text" />
 
         <Button
             android:id="@+id/activity_import_clear_button"
             android:layout_width="0dp"
-            android:layout_weight="1.0"
             android:layout_height="wrap_content"
+            android:layout_weight="1.0"
             android:onClick="onClearButtonClicked"
             android:text="@string/activity_import_clear_button_text" />
- 	</LinearLayout>
- 		<EditText 
- 		    android:id="@+id/activity_import_search_edittext"
- 		    android:layout_height="wrap_content"
-			android:layout_width="fill_parent"
-			android:hint="Friend name"
- 		    />
-        <ListView
-            android:id="@+id/activity_import_list"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </ListView>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/activity_import_progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        style="?android:attr/progressBarStyleHorizontal"
+        />
+    
+    <EditText
+        android:id="@+id/activity_import_search_edittext"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Friend name" />
+    
+    <ListView
+        android:id="@+id/activity_import_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+
+
+</LinearLayout>

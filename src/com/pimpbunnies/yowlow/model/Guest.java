@@ -10,24 +10,26 @@ public class Guest {
 	private String fName;
 	private byte[] fPicture;
 	private boolean fSelected;
+	private String mPictureSource;
 
 	public Guest() {
 
 	}
 
-	public Guest(int id, String name, boolean selected) {
+	public Guest(int id, String name, String pictureSource, boolean selected) {
 		this.fId = id;
 		this.fName = name;
+		this.mPictureSource = pictureSource;
 		this.fSelected = selected;
 	}
 
-	public Guest(int id, String name, boolean selected, byte[] picture) {
-		this(id, name, selected);
+	public Guest(int id, String name, String pictureSource, boolean selected, byte[] picture) {
+		this(id, name, pictureSource, selected);
 		this.fPicture = picture;
 	}
 
-	public Guest(int id, String name, boolean selected, Bitmap picture) {
-		this(id, name, selected);
+	public Guest(int id, String name, String pictureSource, boolean selected, Bitmap picture) {
+		this(id, name, pictureSource, selected);
 		this.fPicture = getBitmapAsByteArray(picture);
 	}
 
@@ -50,8 +52,9 @@ public class Guest {
 
 
 
-	public void setPicture(Bitmap fPicture) {
-		this.fPicture = getBitmapAsByteArray(fPicture);
+	public void setPicture(Bitmap picture) {
+		this.fPicture = getBitmapAsByteArray(picture);
+		System.out.println(fPicture.length);
 	}
 
 	public int getId() {
@@ -70,6 +73,14 @@ public class Guest {
 		this.fName = name;
 	}
 
+	public String getPictureSource() {
+		return mPictureSource;
+	}
+
+	public void setPictureSource(String pictureSource) {
+		this.mPictureSource = pictureSource;
+	}
+	
 	private byte[] getBitmapAsByteArray(Bitmap bitmap) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
