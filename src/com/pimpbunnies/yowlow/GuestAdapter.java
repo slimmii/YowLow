@@ -71,7 +71,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 			
 			if (byteArray != null) {
 				Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
-				holder.guest_list_item_image.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 64,64, false));
+				holder.guest_list_item_image.setImageBitmap(bitmap);
 			} else {
 				holder.guest_list_item_image.setImageResource(R.drawable.ic_missing_person);
 			}

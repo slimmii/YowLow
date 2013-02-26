@@ -40,7 +40,6 @@ import com.facebook.Session.StatusCallback;
 import com.facebook.SessionState;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Guest;
-import com.pimpbunnies.yowlow.util.GuestImageList;
 
 public class ImportActivity extends FacebookActivity {
 
@@ -165,7 +164,8 @@ public class ImportActivity extends FacebookActivity {
 						fGuestAdapter.notifyDataSetChanged();
 						fGuestAdapter.filter();
 						
-						new DownloadImageOperation(true, guests.size()).execute(guests.toArray(new Guest[guests.size()]));
+						// Stage 3 - We now want to asynchronously download the profile images of the guests
+						new DownloadImageOperation(false, guests.size()).execute(guests.toArray(new Guest[guests.size()]));
 
 						//new CreateGuestsOperation().execute(array);
 					} catch (JSONException e) {
@@ -232,8 +232,10 @@ public class ImportActivity extends FacebookActivity {
 					String facebookId = request.getPictureSource().replace("facebook://", "");
 					String pictureUrl = "http://graph.facebook.com/" + facebookId + "/picture?type=" + (mLowQuality?"small":"large");
 					Bitmap bm = getBitmapFromURL(pictureUrl);
-					request.setPicture(bm);
-					publishProgress(bm);
+					Bitmap scaledBitmap = Bitmap.createScaledBitmap(bm, 64,64, false);
+					bm.recycle(); // Recycle the memory!
+					request.setPicture(scaledBitmap);
+					publishProgress(scaledBitmap);
 				}
 			}
 			return bitmaps;
@@ -345,11 +347,11 @@ public class ImportActivity extends FacebookActivity {
 				selectedGuest.setSelected(!selectedGuest.isSelected());
 				
 				
-				if (selectedGuest.isSelected()) {
-				// Stage 3 - We now want to asynchronously download the profile images of the guests
-				new DownloadImageOperation(false, 1).execute(new Guest[] {selectedGuest});
-
-				}
+//				if (selectedGuest.isSelected()) {
+//				// Stage 3 - We now want to asynchronously download the profile images of the guests
+//				new DownloadImageOperation(false, 1).execute(new Guest[] {selectedGuest});
+//
+//				}
 
 				
 				

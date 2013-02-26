@@ -54,6 +54,7 @@ public class Guest {
 
 	public void setPicture(Bitmap picture) {
 		this.fPicture = getBitmapAsByteArray(picture);
+		picture.recycle(); // Recycle the Bitmap, we use the byte array instead.
 		System.out.println(fPicture.length);
 	}
 
