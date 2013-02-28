@@ -47,7 +47,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		public TextView guest_list_item_name;
 		public ImageView guest_list_item_image;
 	}
-
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;

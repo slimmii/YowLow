@@ -34,6 +34,7 @@ public class Guest {
 	}
 
 	public byte[] getPicture() {
+
 		return fPicture;
 	}
 

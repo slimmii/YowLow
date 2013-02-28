@@ -1,32 +1,55 @@
 package com.pimpbunnies.yowlow.views;
 import java.util.ArrayList;
 
-import com.pimpbunnies.yowlow.R;
-
-import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.view.View.OnTouchListener;
+import android.widget.LinearLayout;
 
-public abstract class GenericDieView<T> extends ImageView implements OnTouchListener {
+import com.pimpbunnies.yowlow.R;
+import com.pimpbunnies.yowlow.threedee.GLView;
 
-	private final static int START_DRAGGING = 0;
-	private final static int STOP_DRAGGING = 1;
-
-	private int status;
+public abstract class GenericDieView<T> extends LinearLayout implements OnTouchListener {
+	protected GLView mView;
+	private Context mContext;
 	
 	public GenericDieView(Context context) {
 		super(context);
-		this.setPadding(10, 10, 10, 10);
-		android.support.v7.widget.GridLayout.LayoutParams params = new android.support.v7.widget.GridLayout.LayoutParams();
-//		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		params.setMargins(5, 5, 5, 5);
-		this.setLayoutParams(params);
-		this.setBackgroundResource(R.drawable.image_stroke_generic_die);
+		mContext = context;
+	}
+	
+	public void setTextures(Bitmap[] bitmaps) {
+		this.removeView(mView);
+		mView = new GLView(mContext, bitmaps);
 		
-		this.setOnTouchListener(this);
+		android.support.v7.widget.GridLayout.LayoutParams params = new android.support.v7.widget.GridLayout.LayoutParams();
+		params.width = 150;
+		params.height = 150;
+//		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		mView.setLayoutParams(params);
+		
+		mView.setOnTouchListener(this);
+	
+		this.addView(mView);
+	}
+	
+	public void reset() {
+		Bitmap grumpy = BitmapFactory.decodeResource(getResources(), R.drawable.grumpy);
+		
+		Bitmap bitmap[] = new Bitmap[] {
+				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+				
+		};
+
+		setTextures(bitmap);
 	}
 	
 	public T shuffle() {
@@ -50,6 +73,8 @@ public abstract class GenericDieView<T> extends ImageView implements OnTouchList
 	
 	@Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-		return false;
+		shuffle();
+ 		return false;
     }
 }
+

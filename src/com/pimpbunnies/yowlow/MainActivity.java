@@ -6,6 +6,7 @@ import java.util.List;
 import android.R.integer;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
@@ -14,10 +15,12 @@ import android.view.View;
 import com.facebook.FacebookActivity;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.threedee.GLView;
 import com.pimpbunnies.yowlow.ui.DeviceShaked;
 import com.pimpbunnies.yowlow.ui.Shaker;
 import com.pimpbunnies.yowlow.views.DependantFacebookDieView;
 import com.pimpbunnies.yowlow.views.FacebookDieView;
+import com.pimpbunnies.yowlow.views.GenericDieView;
 import com.pimpbunnies.yowlow.views.RealDieView;
 import com.pimpbunnies.yowlow.views.ShuffleCallback;
 
@@ -54,13 +57,13 @@ public class MainActivity extends FacebookActivity {
 				if (type == null || v.getClass() == type) {
 					if (v instanceof DependantFacebookDieView) {
 						if (guests.size() == 0) {
-							((FacebookDieView) v).resetImageToGrumpy();
+							((FacebookDieView) v).reset();
 							fRollingAllDice = false;
 						} else {
 							if (rolledGuests.size() < guests.size()) {
 								rolledGuests.add(((DependantFacebookDieView) v).shuffle(rolledGuests,shuffle));
 							} else {
-								((FacebookDieView) v).resetImageToGrumpy();
+								((FacebookDieView) v).reset();
 							}
 						}
 					} else if (v instanceof FacebookDieView) {
@@ -98,35 +101,43 @@ public class MainActivity extends FacebookActivity {
 		builder.setMessage("No friends selected/found. Do you want to import facebook data?").setPositiveButton("Yes", dialogClickListener)
 		    .setNegativeButton("No", dialogClickListener).show();
 	}
+	
+	public void addNewDie(GenericDieView die) {
+		fDiceView.addView(die);
+	}
 
 	public void onAddDiceClicked(View view) {
-		final String items[] = {"Facebook (Dependant)", "Facebook (Independant)","Regular"};
-		AlertDialog.Builder ab=new AlertDialog.Builder(MainActivity.this);
-		ab.setTitle("Dice kind");
-		ab.setItems(items, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface d, int choice) {
-				BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(MainActivity.this);
-				int size = db.getAllSelectedGuests().size();
-				if(choice == 0) {
-					if (size == 0) {
-						askToGoToImportActivity();
-					} else {
-						fDiceView.addView(new DependantFacebookDieView(MainActivity.this));
-					}
-				}
-				if(choice == 1) {
-					if (size == 0) {
-						askToGoToImportActivity();
-					} else {
-						fDiceView.addView(new FacebookDieView(MainActivity.this));
-					}
-				}				
-				else if(choice == 2) {
-					fDiceView.addView(new RealDieView(MainActivity.this));
-				}
-			}
-		});
-		ab.show();		
+//		final String items[] = {"Facebook (Dependant)", "Facebook (Independant)","Regular"};
+//		AlertDialog.Builder ab=new AlertDialog.Builder(MainActivity.this);
+//		ab.setTitle("Dice kind");
+//		ab.setItems(items, new DialogInterface.OnClickListener() {
+//			public void onClick(DialogInterface d, int choice) {
+//				BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(MainActivity.this);
+//				int size = db.getAllSelectedGuests().size();
+//				if(choice == 0) {
+//					if (size == 0) {
+//						askToGoToImportActivity();
+//					} else {
+//						fDiceView.addView(new DependantFacebookDieView(MainActivity.this));
+//					}
+//				}
+//				if(choice == 1) {
+//					if (size == 0) {
+//						askToGoToImportActivity();
+//					} else {
+//						fDiceView.addView(new FacebookDieView(MainActivity.this));
+//					}
+//				}				
+//				else if(choice == 2) {
+//					fDiceView.addView(new RealDieView(MainActivity.this));
+//				}
+//			}
+//		});
+//		ab.show();		
+		
+		DiceKindDialog dialog = new DiceKindDialog(this);
+		dialog.show();
+		
 	}
 
 
@@ -141,7 +152,7 @@ public class MainActivity extends FacebookActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		fDiceView = (GridLayout) findViewById(R.id.activity_main_dice_view);
-
+		
 		Shaker shaker = new Shaker(this, new DeviceShaked() {	
 			@Override
 			public void shaked() {

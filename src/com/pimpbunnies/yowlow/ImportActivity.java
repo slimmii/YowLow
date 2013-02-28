@@ -16,6 +16,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -56,6 +58,8 @@ public class ImportActivity extends FacebookActivity {
 	private ProgressDialog fSaveDialog;
 	/** End of list **/
 
+	private DownloadImageOperation mDownloadImageOperation;
+	
 	private boolean mImporting = false;
 	
 	private List<Guest> guests = new ArrayList<Guest>();
@@ -103,14 +107,41 @@ public class ImportActivity extends FacebookActivity {
 	}
 
 	public void onClearButtonClicked(View view) {
+		if (mDownloadImageOperation != null) {
+			// RESET IMPORT
+			mDownloadImageOperation.cancel(true);
+			fDownloadProgressBar.setMax(0);
+			fDownloadProgressBar.setProgress(0);
+		}
+		
 		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(ImportActivity.this);
 		db.flush();
 		guests.clear();
 		fGuestAdapter.filter();
 		
 	}
+	
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null;
+	}
 
 	public void onImportButtonClicked(View view) {
+		
+		if (!isNetworkAvailable()) {
+			Toast.makeText(this, "Facebook import failed: there is no network available.", Toast.LENGTH_LONG).show();
+			return;
+		}
+		
+		if (mDownloadImageOperation != null) {
+			// RESET IMPORT
+			mDownloadImageOperation.cancel(true);
+		}
+		
+		Toast.makeText(this, "Importing all your friends from facebook. You cannot save during this process", Toast.LENGTH_LONG).show();
+		
 		System.out.println("ImportActivity.onImportButtonClicked()");
 		if (fFacebookLinkActive) {
 			Session session = Session.getActiveSession();
@@ -165,8 +196,8 @@ public class ImportActivity extends FacebookActivity {
 						fGuestAdapter.filter();
 						
 						// Stage 3 - We now want to asynchronously download the profile images of the guests
-						new DownloadImageOperation(false, guests.size()).execute(guests.toArray(new Guest[guests.size()]));
-
+						mDownloadImageOperation = new DownloadImageOperation(false, guests.size());
+						mDownloadImageOperation.execute(guests.toArray(new Guest[guests.size()]));
 						//new CreateGuestsOperation().execute(array);
 					} catch (JSONException e) {
 						e.printStackTrace();

@@ -36,15 +36,8 @@ public class DependantFacebookDieView extends FacebookDieView {
 		return guest;
 	}
 	
-	@Override
-	public void setupClickListener() {
-		this.setOnClickListener(onClickListener);
-	}
-	
 	public DependantFacebookDieView(MainActivity context) {
 		super(context);
-		this.setBackgroundResource(R.drawable.image_stroke_facebook_dependant);
-		this.setupClickListener();
 	}
 
 }
