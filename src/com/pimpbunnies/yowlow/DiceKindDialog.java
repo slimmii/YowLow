@@ -2,7 +2,6 @@ package com.pimpbunnies.yowlow;
 
 import java.util.ArrayList;
 
-import com.pimpbunnies.yowlow.views.DependantFacebookDieView;
 import com.pimpbunnies.yowlow.views.FacebookDieView;
 import com.pimpbunnies.yowlow.views.RealDieView;
 
@@ -40,16 +39,12 @@ public class DiceKindDialog extends Dialog {
 		final DiceKind regular = new DiceKind("Regular Dice", 
 				"Just a plain old die", 
 				getContext().getResources().getDrawable(R.drawable.ic_launcher));
-		final DiceKind facebookDep = new DiceKind("Facebook Dice (independant)",
+		final DiceKind facebook = new DiceKind("Facebook Dice",
 				"An independant dice. One friend can appear on more than one dice after rolling.", 
 				getContext().getResources().getDrawable(R.drawable.ic_facebook));
-		final DiceKind facebookIndep = new DiceKind("Facebook Dice (dependant)", 
-				"A dependant dice. If a friend has been randomly chosen it will not appear on the other dice.", 
-				getContext().getResources().getDrawable(R.drawable.ic_facebook));
-		
 		kinds.add(regular);
-		kinds.add(facebookDep);
-		kinds.add(facebookIndep);
+		kinds.add(facebook);
+
 		
 		mDiceKinds = new DiceKindAdapter(this.getContext(),  kinds);
 		
@@ -64,12 +59,9 @@ public class DiceKindDialog extends Dialog {
 				if (mListview.getSelectedItem() == regular) {					
 					mMainActivity.addNewDie(new RealDieView(mMainActivity));
 				}
-				if (mListview.getSelectedItem() == facebookDep) {					
-					mMainActivity.addNewDie(new DependantFacebookDieView(mMainActivity));
-				}
-				if (mListview.getSelectedItem() == facebookIndep) {					
+				if (mListview.getSelectedItem() == facebook) {					
 					mMainActivity.addNewDie(new FacebookDieView(mMainActivity));
-				}
+				}	
 			}
 		});
 		

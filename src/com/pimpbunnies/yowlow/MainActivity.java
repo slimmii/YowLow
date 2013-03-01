@@ -18,7 +18,6 @@ import com.pimpbunnies.yowlow.model.Guest;
 import com.pimpbunnies.yowlow.threedee.GLView;
 import com.pimpbunnies.yowlow.ui.DeviceShaked;
 import com.pimpbunnies.yowlow.ui.Shaker;
-import com.pimpbunnies.yowlow.views.DependantFacebookDieView;
 import com.pimpbunnies.yowlow.views.FacebookDieView;
 import com.pimpbunnies.yowlow.views.GenericDieView;
 import com.pimpbunnies.yowlow.views.RealDieView;
@@ -28,8 +27,6 @@ public class MainActivity extends FacebookActivity {
 
 	private GridLayout fDiceView;
 
-	private ArrayList<Guest> rolledGuests;
-	private ArrayList<Integer> rolledNumbers;
 	private boolean fRollingAllDice = false;
 
 	public void onRollAllDice(View view) {
@@ -48,35 +45,23 @@ public class MainActivity extends FacebookActivity {
 	public void onRollAllDice(View view, Class type) {
 		if (!fRollingAllDice) {
 			fRollingAllDice = true;
-			rolledGuests = new ArrayList<Guest>();
-			rolledNumbers = new ArrayList<Integer>();	
-			BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(this);
-			List<Guest> guests = db.getAllSelectedGuests();
 			for (int i = 0; i < fDiceView.getChildCount(); i++) {
-				View v = fDiceView.getChildAt(i);
-				if (type == null || v.getClass() == type) {
-					if (v instanceof DependantFacebookDieView) {
-						if (guests.size() == 0) {
-							((FacebookDieView) v).reset();
-							fRollingAllDice = false;
-						} else {
-							if (rolledGuests.size() < guests.size()) {
-								rolledGuests.add(((DependantFacebookDieView) v).shuffle(rolledGuests,shuffle));
-							} else {
-								((FacebookDieView) v).reset();
-							}
-						}
-					} else if (v instanceof FacebookDieView) {
-						if (guests.size() == 0) {
-							fRollingAllDice = false;							
-						} else {
-							((FacebookDieView) v).shuffle(shuffle);
-						}
-					} else if (v instanceof RealDieView) {
-						rolledNumbers.add(((RealDieView) v).shuffle(shuffle));
+			View v = fDiceView.getChildAt(i);
+			if (type == null || v.getClass() == type) {
+				if (v instanceof FacebookDieView) {
+					BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(this);
+					List<Guest> guests = db.getAllSelectedGuests();					
+					if (guests.size() == 0) {
+						fRollingAllDice = false;							
+					} else {
+						((FacebookDieView) v).shuffle(shuffle);
 					}
+				} else if (v instanceof RealDieView) {
+					((RealDieView) v).shuffle(shuffle);
 				}
-			}	
+			}
+		}	
+			
 		}
 	}
 	

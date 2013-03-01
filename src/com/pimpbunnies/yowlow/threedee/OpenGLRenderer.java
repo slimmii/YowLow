@@ -3,6 +3,8 @@ package com.pimpbunnies.yowlow.threedee;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.pimpbunnies.yowlow.views.ShuffleCallback;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView.Renderer;
@@ -23,28 +25,33 @@ public class OpenGLRenderer implements Renderer {
 	private Context context;
 	
 	private float mSpeed = 0.0f;
+	private boolean mDirty = true;
+	private ShuffleCallback mCb;
 	
 	/**
 	 * Instance the Cube object and set 
 	 * the Activity Context handed over
 	 */
-	public OpenGLRenderer(Context context, Bitmap[] bitmaps) {
+	public OpenGLRenderer(Context context, Cube cube) {
 		this.context = context;
-		
-		cube = new Cube(bitmaps);
+		this.cube = cube;
+		mDirty = true;
 	}
 	
-	public void roll() {
+	public void shuffle(ShuffleCallback cb) {
 		mSpeed = 12.9f;
+		mCb = cb;
 	}
 
+	public void setCube(Cube cube) {
+		this.cube = cube;
+		mDirty = true;
+	}
+	
 	/**
 	 * The Surface is created/init()
 	 */
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {		
-		//Load the texture for the cube once during Surface creation
-		cube.loadGLTexture(gl, this.context);
-		
 		gl.glEnable(GL10.GL_TEXTURE_2D);			//Enable Texture Mapping ( NEW )
 		gl.glShadeModel(GL10.GL_SMOOTH); 			//Enable Smooth Shading
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); 	//Black Background
@@ -53,13 +60,21 @@ public class OpenGLRenderer implements Renderer {
 		gl.glDepthFunc(GL10.GL_LEQUAL); 			//The Type Of Depth Testing To Do
 		
 		//Really Nice Perspective Calculations
-		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST); 
+		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 	}
 
 	/**
 	 * Here we do our drawing
 	 */
 	public void onDrawFrame(GL10 gl) {
+		if (mDirty) {
+			if (cube != null) {
+				cube.loadGLTexture(gl, context);
+				mDirty = false;	
+				return;
+			}
+		}
+		
 		//Clear Screen And Depth Buffer
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);	
 		gl.glLoadIdentity();					//Reset The Current Modelview Matrix
@@ -73,15 +88,22 @@ public class OpenGLRenderer implements Renderer {
 		gl.glRotatef(yrot, 1.0f, 1.0f, 1.0f);	//Y
 		gl.glRotatef(zrot, 0.0f, 1.0f, 0.0f);	//Z
 				
-		cube.draw(gl);							//Draw the Cube	
-		
-		//Change rotation factors (nice rotation)
-		
-		mSpeed = mSpeed - 0.1f;
-		if (mSpeed >= 0) {
-			xrot += mSpeed;
-			yrot += mSpeed;
-			zrot += mSpeed;
+		if (cube != null) {
+			cube.draw(gl);							//Draw the Cube	
+			
+			//Change rotation factors (nice rotation)
+			
+			if (mSpeed > 0) {
+				mSpeed = mSpeed - 0.1f;				
+				xrot += mSpeed;
+				yrot += mSpeed;
+				zrot += mSpeed;
+			} else {
+				if (mCb != null) {
+					mCb.shuffled();
+					mCb = null;
+				}
+			}
 		}
 	}
 
