@@ -11,25 +11,27 @@ public class Guest {
 	private byte[] fPicture;
 	private boolean fSelected;
 	private String mPictureSource;
+	private String mGroup;
 
 	public Guest() {
 
 	}
 
-	public Guest(int id, String name, String pictureSource, boolean selected) {
+	public Guest(int id, String name, String pictureSource, String group, boolean selected) {
 		this.fId = id;
 		this.fName = name;
 		this.mPictureSource = pictureSource;
 		this.fSelected = selected;
+		this.mGroup = group;
 	}
 
-	public Guest(int id, String name, String pictureSource, boolean selected, byte[] picture) {
-		this(id, name, pictureSource, selected);
+	public Guest(int id, String name, String pictureSource, String group, boolean selected, byte[] picture) {
+		this(id, name, pictureSource, group, selected);
 		this.fPicture = picture;
 	}
 
-	public Guest(int id, String name, String pictureSource, boolean selected, Bitmap picture) {
-		this(id, name, pictureSource, selected);
+	public Guest(int id, String name, String pictureSource, String group, boolean selected, Bitmap picture) {
+		this(id, name, pictureSource, group, selected);
 		this.fPicture = getBitmapAsByteArray(picture);
 	}
 
@@ -51,6 +53,14 @@ public class Guest {
 		this.fSelected = selected;
 	}
 
+
+	public String getGroup() {
+		return mGroup;
+	}
+
+	public void setGroup(String group) {
+		this.mGroup = group;
+	}
 
 
 	public void setPicture(Bitmap picture) {

@@ -1,5 +1,7 @@
 package com.pimpbunnies.yowlow;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,25 +14,32 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.facebook.FacebookActivity;
 import com.facebook.Request;
@@ -40,16 +49,15 @@ import com.facebook.Session;
 import com.facebook.Session.OpenRequest;
 import com.facebook.Session.StatusCallback;
 import com.facebook.SessionState;
+import com.markupartist.android.widget.ActionBar;
+import com.markupartist.android.widget.ActionBar.AbstractAction;
+import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Guest;
 
 public class ImportActivity extends FacebookActivity {
 
 	/** List of Views **/
-	private Button activity_import_import_button;
-	private Button activity_import_open_session_button;
-	private Button activity_import_clear_button;
-	private Button activity_import_save_button;
 	private EditText activity_import_search_edittext;
 
 	private ListView activity_import_list;
@@ -57,6 +65,8 @@ public class ImportActivity extends FacebookActivity {
 	private ProgressBar fDownloadProgressBar;
 	private ProgressDialog fSaveDialog;
 	/** End of list **/
+	
+    private static final int SELECT_PICTURE = 1;
 
 	private DownloadImageOperation mDownloadImageOperation;
 	
@@ -88,12 +98,16 @@ public class ImportActivity extends FacebookActivity {
 	private GuestAdapter fGuestAdapter;
 	private boolean fFacebookLinkActive = false;
 
-	public void onSaveButtonClicked(View view) {
+	public void onSaveButtonClicked() {
 		System.out.println("ImportActivity.onSaveButtonClicked()");
 		
-		Guest[] array = new Guest[guests.size()];
-		array = guests.toArray(array);
-		new SaveOperation().execute(array);
+		if (!mImporting) {		
+			Guest[] array = new Guest[guests.size()];
+			array = guests.toArray(array);
+			new SaveOperation().execute(array);
+ 		} else {
+ 			Toast.makeText(this, "You cannot save during import", Toast.LENGTH_SHORT).show();
+ 		}
 
 	}
 
@@ -106,7 +120,7 @@ public class ImportActivity extends FacebookActivity {
 		return guests;
 	}
 
-	public void onClearButtonClicked(View view) {
+	public void onClearButtonClicked() {
 		if (mDownloadImageOperation != null) {
 			// RESET IMPORT
 			mDownloadImageOperation.cancel(true);
@@ -128,7 +142,7 @@ public class ImportActivity extends FacebookActivity {
 	    return activeNetworkInfo != null;
 	}
 
-	public void onImportButtonClicked(View view) {
+	public void onImportButtonClicked() {
 		
 		if (!isNetworkAvailable()) {
 			Toast.makeText(this, "Facebook import failed: there is no network available.", Toast.LENGTH_LONG).show();
@@ -139,8 +153,6 @@ public class ImportActivity extends FacebookActivity {
 			// RESET IMPORT
 			mDownloadImageOperation.cancel(true);
 		}
-		
-		Toast.makeText(this, "Importing all your friends from facebook. You cannot save during this process", Toast.LENGTH_LONG).show();
 		
 		System.out.println("ImportActivity.onImportButtonClicked()");
 		if (fFacebookLinkActive) {
@@ -154,11 +166,9 @@ public class ImportActivity extends FacebookActivity {
 			fImportDialog.show();
 			
 			guests.clear();
-			
-			activity_import_save_button.setEnabled(false);
 
 			// make request to the /me API
-			Request.executeGraphPathRequestAsync(session, "/me/friends",
+			Request.executeGraphPathRequestAsync(session, "/102909926563430/attending",
 					new Callback() {
 				@Override
 				public void onCompleted(Response response) {
@@ -176,7 +186,7 @@ public class ImportActivity extends FacebookActivity {
 							for(int i = 0 ; i < array.length() ; i++){
 								String id = array.getJSONObject(i).getString("id");
 								String name = array.getJSONObject(i).getString("name");
-								Guest guest = new Guest(0, name, "facebook://" + id, false);
+								Guest guest = new Guest(0, name, "facebook://" + id, "", false);
 								guests.add(guest);
 								System.out.println(guest.getName() + " added!");
 							}
@@ -300,8 +310,8 @@ public class ImportActivity extends FacebookActivity {
 
 		@Override
 		protected void onPostExecute(List<Bitmap> bitmaps) {
-			super.onPostExecute(bitmaps); 
-			activity_import_save_button.setEnabled(true);
+			super.onPostExecute(bitmaps);
+			mImporting = false;
 		}
 	}
 	
@@ -309,7 +319,8 @@ public class ImportActivity extends FacebookActivity {
 	    @Override
 	    public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {	    	
 	    	System.out.println("Filtering " + arg0);
-	    	fGuestAdapter.filter(arg0.toString());
+	    	fGuestAdapter.setFilterString(arg0.toString());
+	    	fGuestAdapter.filter();
 	    }
 
 	    @Override
@@ -322,16 +333,164 @@ public class ImportActivity extends FacebookActivity {
 		}
 	};
 
+	private class ImportAction extends AbstractAction {
+
+		public ImportAction() {
+			super(R.drawable.ic_facebook_icon);
+		}
+
+		@Override
+		public void performAction(View view) {
+			onImportButtonClicked();
+		}
+
+	}	
+	
+	private class SaveAction extends AbstractAction {
+
+		public SaveAction() {
+			super(R.drawable.ic_save);
+		}
+
+		@Override
+		public void performAction(View view) {
+			onSaveButtonClicked();
+		}
+
+	}	
+	
+	private class ClearAction extends AbstractAction {
+
+		public ClearAction() {
+			super(R.drawable.ic_clear);
+		}
+
+		@Override
+		public void performAction(View view) {
+			onClearButtonClicked();
+		}
+
+	}
+	
+	private class CameraAction extends AbstractAction {
+
+		public CameraAction() {
+			super(R.drawable.ic_camera);
+		}
+
+		@Override
+		public void performAction(View view) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent,"Select Picture"), SELECT_PICTURE);
+
+		}
+
+	}	
+	
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                final Uri selectedImageUri = data.getData();
+                try {
+					Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+					final Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 64,64, false);
+					bitmap.recycle();
+					// Set an EditText view to get user input 
+					final EditText input = new EditText(this);
+					new AlertDialog.Builder(ImportActivity.this)
+				    .setTitle("Enter ")
+				    .setMessage("ZOMGS")
+				    .setView(input)
+				    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				        public void onClick(DialogInterface dialog, int whichButton) {
+				        	String name = input.getText().toString();
+				            if (!name.toString().equals("")) {
+				            	Guest guest = new Guest(0, name, "image://" + selectedImageUri.getPath() , "", false);
+				            	guest.setPicture(scaledBitmap);
+				            	guests.add(guest);
+				            	fGuestAdapter.notifyDataSetChanged();
+				            	fGuestAdapter.filter();
+				            } else {
+				            	
+				            }
+				        }
+				    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				        public void onClick(DialogInterface dialog, int whichButton) {
+				            // Do nothing.
+				        }
+				    }).show();
+					
+					
+					
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        }
+    }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_import);
 		
+		final ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
+		
+		actionBar.setTitle("Facebook Import");
+		
+		actionBar.addAction(new CameraAction());
+		actionBar.addAction(new ImportAction());
+		actionBar.addAction(new ClearAction());		
+		actionBar.addAction(new SaveAction());
+		
+        actionBar.setHomeAction(new IntentAction(this, MainActivity.createIntent(this), R.drawable.ic_title_home_default));
+        actionBar.setDisplayHomeAsUpEnabled(false);
+		
 		activity_import_search_edittext = (EditText) findViewById(R.id.activity_import_search_edittext);
+		
+		final ToggleButton toggleFacebook = (ToggleButton) findViewById(R.id.activity_import_facebook_filter_toggle);
+		final ToggleButton toggleImage = (ToggleButton)findViewById(R.id.activity_import_image_filter_toggle);
+
+		toggleFacebook.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (toggleFacebook.isChecked() && toggleImage.isChecked()) {
+					fGuestAdapter.setFilterSource("");
+				} else if (toggleFacebook.isChecked()) {
+					fGuestAdapter.setFilterSource("facebook://");
+				} else if (toggleImage.isChecked()) {
+					fGuestAdapter.setFilterSource("image://");
+				} else {
+					fGuestAdapter.setFilterSource("null://");
+				}
+				fGuestAdapter.filter();
+			}
+		});
+		
+		toggleImage.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (toggleFacebook.isChecked() && toggleImage.isChecked()) {
+					fGuestAdapter.setFilterSource("");
+				} else if (toggleImage.isChecked()) {
+					fGuestAdapter.setFilterSource("image://");
+				} else if (toggleFacebook.isChecked()) {
+					fGuestAdapter.setFilterSource("facebook://");
+				} else {
+					fGuestAdapter.setFilterSource("null://");
+				}
+				fGuestAdapter.filter();
+			}
+		});
+		
 		activity_import_search_edittext.addTextChangedListener(searchTextWatcher);
-		activity_import_save_button = (Button) findViewById(R.id.activity_import_save_button);
-		activity_import_import_button = (Button) findViewById(R.id.activity_import_import_button);
 		activity_import_list = (ListView) findViewById(R.id.activity_import_list);		
 		
 		fDownloadProgressBar = (ProgressBar) findViewById(R.id.activity_import_progress);
@@ -390,7 +549,7 @@ public class ImportActivity extends FacebookActivity {
 			}
 			
 		});
-		
+		fGuestAdapter.filter();
 		
 		//    
 		//    BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(this);

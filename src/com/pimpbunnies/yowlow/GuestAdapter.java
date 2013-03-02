@@ -1,4 +1,5 @@
 package com.pimpbunnies.yowlow;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,8 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 	private List<Guest> fOrigionalValues;
 	private List<Guest> fObjects;
 	private Filter fFilter;
-	private String mFilterString;
+	private String mFilterString = "";
+	private String mFilterSource = "";
 
 	public String getFilterString() {
 		return mFilterString;
@@ -35,45 +37,55 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		this.mFilterString = filterString;
 	}
 
-	public GuestAdapter(Context context, int viewResourceId,
-			List<Guest> guests) {
+	public void setFilterSource(String filterSource) {
+		this.mFilterSource = filterSource;
+	}
+
+	public String getFilterSource() {
+		return mFilterSource;
+	}
+
+	public GuestAdapter(Context context, int viewResourceId, List<Guest> guests) {
 		super(context, viewResourceId, guests);
 		fContext = context;
 		fOrigionalValues = guests;
 		fObjects = new ArrayList<Guest>(guests);
 	}
 
-	public static class ViewHolder{
+	public static class ViewHolder {
 		public TextView guest_list_item_name;
 		public ImageView guest_list_item_image;
 	}
-	
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
 		ViewHolder holder;
 		if (v == null) {
-			LayoutInflater vi =
-					(LayoutInflater) fContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater vi = (LayoutInflater) fContext
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			v = vi.inflate(R.layout.guest_list_item, null);
 			holder = new ViewHolder();
-			holder.guest_list_item_name = (TextView) v.findViewById(R.id.guest_list_item_name);
-			holder.guest_list_item_image = (ImageView) v.findViewById(R.id.guest_list_item_image);
+			holder.guest_list_item_name = (TextView) v
+					.findViewById(R.id.guest_list_item_name);
+			holder.guest_list_item_image = (ImageView) v
+					.findViewById(R.id.guest_list_item_image);
 			v.setTag(holder);
-		}
-		else
-			holder=(ViewHolder)v.getTag();
+		} else
+			holder = (ViewHolder) v.getTag();
 
 		final Guest guest = getItem(position);
 		if (guest != null) {
 			holder.guest_list_item_name.setText(guest.getName());
 			byte[] byteArray = guest.getPicture();
-			
+
 			if (byteArray != null) {
-				Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
+				Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
+						byteArray.length);
 				holder.guest_list_item_image.setImageBitmap(bitmap);
 			} else {
-				holder.guest_list_item_image.setImageResource(R.drawable.ic_missing_person);
+				holder.guest_list_item_image
+						.setImageResource(R.drawable.ic_missing_person);
 			}
 
 		}
@@ -84,18 +96,19 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		}
 		return v;
 	}
-	
+
 	@Override
 	public void remove(Guest object) {
 		fOrigionalValues.remove(object);
 		this.notifyDataSetChanged();
 	}
+
 	@Override
 	public void add(Guest object) {
 		fOrigionalValues.add(object);
 		this.notifyDataSetChanged();
 	}
-	
+
 	public void addAll(List<Guest> guests) {
 		for (Guest guest : guests) {
 			fOrigionalValues.add(guest);
@@ -119,40 +132,41 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		}
 		return fFilter;
 	}
-	
-	public void filter(String string) {
-		mFilterString = string;
-		filter();
-	}
-	
+
 	public void filter() {
-		getFilter().filter(mFilterString);
+		getFilter().filter(mFilterString + " @@@ " + mFilterSource);
 	}
 
 	private class CustomFilter extends Filter {
 
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
+
 			FilterResults results = new FilterResults();
-			if(constraint == null || constraint.length() == 0) {
-				ArrayList<Guest> list = new ArrayList<Guest>(fOrigionalValues);
-				results.values = list;
-				results.count = list.size();
-			} else {
-				String filter = constraint.toString().toLowerCase();
-				ArrayList<Guest> newValues = new ArrayList<Guest>();
-				for(int i = 0; i < fOrigionalValues.size(); i++) {
-					Guest item = fOrigionalValues.get(i);
-					String[] parts = item.getName().split(" ");
-					for (int j=0;j<parts.length;j++) {
-						if(parts[j].toLowerCase().startsWith(filter)) {
+
+			if (mFilterString == null) {
+				mFilterString = "";
+			}
+
+			String filter = mFilterString.toString().toLowerCase();
+			ArrayList<Guest> newValues = new ArrayList<Guest>();
+			for (int i = 0; i < fOrigionalValues.size(); i++) {
+				Guest item = fOrigionalValues.get(i);
+				String[] parts = item.getName().split(" ");
+				if (!item.getPictureSource().startsWith(
+						mFilterSource)) {
+
+				} else {			
+					for (int j = 0; j < parts.length; j++) {
+						if (parts[j].toLowerCase().startsWith(filter)) {
 							newValues.add(item);
+							break;
 						}
 					}
 				}
-				results.values = newValues;
-				results.count = newValues.size();
-			}       
+			}
+			results.values = newValues;
+			results.count = newValues.size();
 
 			return results;
 		}

@@ -85,7 +85,7 @@ public class OpenGLRenderer implements Renderer {
 		
 		//Rotate around the axis based on the rotation matrix (rotation, x, y, z)
 		gl.glRotatef(xrot, 0.0f, 1.0f, 0.0f);	//X
-		gl.glRotatef(yrot, 1.0f, 1.0f, 1.0f);	//Y
+		gl.glRotatef(yrot, 0.0f, 1.0f, 0.0f);	//Y
 		gl.glRotatef(zrot, 0.0f, 1.0f, 0.0f);	//Z
 				
 		if (cube != null) {

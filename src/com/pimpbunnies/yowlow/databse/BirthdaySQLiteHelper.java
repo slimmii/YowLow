@@ -33,6 +33,7 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
   private static final String KEY_NAME = "name";
   private static final String KEY_PICTURE = "picture";
   private static final String KEY_PICTURE_SOURCE = "picture_source";
+  private static final String KEY_GROUP = "dice_group";
   private static final String KEY_SELECTED = "selected";
 
   @Override
@@ -41,6 +42,7 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
         + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, "
         + KEY_PICTURE + " BLOB, "
         + KEY_PICTURE_SOURCE + " TEXT, "
+        + KEY_GROUP + " TEXT, "
         + KEY_SELECTED + " INTEGER" 
         + ")";
     db.execSQL(CREATE_CONTACTS_TABLE);
@@ -68,27 +70,28 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
     values.put(KEY_NAME, guest.getName()); // Guest Name
     values.put(KEY_PICTURE, guest.getPicture()); // Guest Picture
     values.put(KEY_PICTURE_SOURCE, guest.getPictureSource()); // Guest Picture
+    values.put(KEY_GROUP, guest.getGroup()); // Guest Group
     values.put(KEY_SELECTED, (guest.isSelected()) ? 1 : 0); // Guest Picture
     
     // Inserting Row
     db.insert(TABLE_GUESTS, null, values);
     db.close(); // Closing database connection
   }
-
-  // Getting single Guest
-  public Guest getGuest(int id) {
-    SQLiteDatabase db = this.getReadableDatabase();
-
-    Cursor cursor = db.query(TABLE_GUESTS, new String[] { KEY_ID,
-        KEY_NAME, KEY_PICTURE, KEY_PICTURE_SOURCE ,KEY_SELECTED }, KEY_ID + "=?",
-        new String[] { String.valueOf(id) }, null, null, null, null);
-    if (cursor != null)
-      cursor.moveToFirst();
-    Guest contact = new Guest(Integer.parseInt(cursor.getString(0)),
-        cursor.getString(1), cursor.getString(2), cursor.getInt(3)!=0);
-    db.close();
-    return contact;
-  }
+//
+//  // Getting single Guest
+//  public Guest getGuest(int id) {
+//    SQLiteDatabase db = this.getReadableDatabase();
+//
+//    Cursor cursor = db.query(TABLE_GUESTS, new String[] { KEY_ID,
+//        KEY_NAME, KEY_PICTURE, KEY_PICTURE_SOURCE, KEY_GROUP ,KEY_SELECTED }, KEY_ID + "=?",
+//        new String[] { String.valueOf(id) }, null, null, null, null);
+//    if (cursor != null)
+//      cursor.moveToFirst();
+//    Guest contact = new Guest(Integer.parseInt(cursor.getString(0)),
+//        cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4)!=0);
+//    db.close();
+//    return contact;
+//  }
 
   public int getGuestCount() {
     String countQuery = "SELECT  * FROM " + TABLE_GUESTS;
@@ -117,7 +120,8 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 	        guest.setName(cursor.getString(1));
 	        guest.setPicture(cursor.getBlob(2));
 	        guest.setPictureSource(cursor.getString(3));
-	        guest.setSelected(cursor.getInt(4)!=0);
+	        guest.setGroup(cursor.getString(4));
+	        guest.setSelected(cursor.getInt(5)!=0);
 	        // Adding contact to list
 	        guestList.add(guest);
 	      } while (cursor.moveToNext());
@@ -145,7 +149,8 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
         guest.setName(cursor.getString(1));
         guest.setPicture(cursor.getBlob(2));
         guest.setPictureSource(cursor.getString(3));
-        guest.setSelected(cursor.getInt(4)!=0);
+        guest.setGroup(cursor.getString(4));
+        guest.setSelected(cursor.getInt(5)!=0);
         // Adding contact to list
         guestList.add(guest);
       } while (cursor.moveToNext());

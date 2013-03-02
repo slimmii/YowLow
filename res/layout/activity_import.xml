@@ -5,59 +5,49 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/activity_import_import_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onImportButtonClicked"
-            android:text="@string/activity_import_import_button_text" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/activity_import_save_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:onClick="onSaveButtonClicked"
-            android:text="@string/activity_import_save_button_text" />
-
-        <Button
-            android:id="@+id/activity_import_clear_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:onClick="onClearButtonClicked"
-            android:text="@string/activity_import_clear_button_text" />
-    </LinearLayout>
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        style="@style/ActionBar" />
 
     <ProgressBar
         android:id="@+id/activity_import_progress"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" 
         style="?android:attr/progressBarStyleHorizontal"
-        />
-    
-    <EditText
-        android:id="@+id/activity_import_search_edittext"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="Friend name" />
-    
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <ToggleButton
+            android:id="@+id/activity_import_facebook_filter_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shuffle_facebook_button"
+            android:checked="true"
+            android:textOff=""
+            android:textOn="" />
+        
+        <ToggleButton
+            android:id="@+id/activity_import_image_filter_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shuffle_camera_button"
+            android:checked="true"
+            android:textOff=""
+            android:textOn="" />        
+
+        <EditText
+            android:id="@+id/activity_import_search_edittext"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Friend name" />
+    </LinearLayout>
+
     <ListView
         android:id="@+id/activity_import_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
     </ListView>
-
 
 </LinearLayout>

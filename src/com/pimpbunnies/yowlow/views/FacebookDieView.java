@@ -41,16 +41,32 @@ public class FacebookDieView extends GenericDieView<Guest> {
 		Bitmap grumpy = BitmapFactory.decodeResource(getResources(),
 				R.drawable.grumpy);
 
-		Bitmap bitmap[] = new Bitmap[] {
-				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
-				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
-				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
-				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
-				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
-				BitmapFactory.decodeResource(getResources(), R.drawable.grumpy),
+		final Random rand = new Random();
 
-		};
-		return bitmap;
+		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(getContext());
+		fSelectedGuests = db.getAllSelectedGuests();
+		db.close();
+
+		if (fSelectedGuests.size() > 0) {
+			long seed = System.nanoTime();
+			Collections.shuffle(fSelectedGuests, new Random(seed));
+	
+			fResult = getRandomGuest();
+		}
+		fShuffleing = true;
+
+		Bitmap[] bitmaps = new Bitmap[6];
+		int i = 0;
+		for (i = 0; i < 6 && i < fSelectedGuests.size(); i++) {
+			bitmaps[i] = BitmapFactory.decodeByteArray(fSelectedGuests.get(i)
+					.getPicture(), 0,
+					fSelectedGuests.get(i).getPicture().length);
+		}
+		for (; i < 6 ; i++) {
+			bitmaps[i] = BitmapFactory.decodeResource(getResources(), R.drawable.grumpy);		
+		}
+		
+		return bitmaps;
 	}
 
 	public Guest getRandomGuest() {
@@ -67,31 +83,10 @@ public class FacebookDieView extends GenericDieView<Guest> {
 	@Override
 	public Guest shuffle(final ShuffleCallback cb) {
 		final Handler handler = new Handler();
-		final Random rand = new Random();
 
-		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(getContext());
-		fSelectedGuests = db.getAllSelectedGuests();
-		if (fSelectedGuests.size() == 0) {
-			return null;
-		}
-		long seed = System.nanoTime();
-		Collections.shuffle(fSelectedGuests, new Random(seed));
-
-		fResult = getRandomGuest();
-		fShuffleing = true;
-
-		Bitmap[] bitmaps = new Bitmap[6];
-		int i = 0;
-		for (i = 0; i < 6; i++) {
-			bitmaps[i] = BitmapFactory.decodeByteArray(fSelectedGuests.get(i)
-					.getPicture(), 0,
-					fSelectedGuests.get(i).getPicture().length);
-		}
-
-		mView.setCube(new Cube(bitmaps));
+		mView.setCube(new Cube(getFaces()));
 		mView.shuffle(cb);
 
-		db.close();
 
 		return fResult;
 	}
