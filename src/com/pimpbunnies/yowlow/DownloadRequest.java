@@ -1,12 +1,12 @@
 package com.pimpbunnies.yowlow;
 
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 
 public class DownloadRequest {
     private String fId;
-    private Guest fGuest;
+    private Image fGuest;
         
-    public DownloadRequest(String id, Guest guest) {
+    public DownloadRequest(String id, Image guest) {
       super();
       this.fId = id;
       this.fGuest = guest;
@@ -18,10 +18,10 @@ public class DownloadRequest {
     public void setId(String fId) {
       this.fId = fId;
     }
-    public Guest getGuest() {
+    public Image getGuest() {
       return fGuest;
     }
-    public void setGuest(Guest fGuest) {
+    public void setGuest(Image fGuest) {
       this.fGuest = fGuest;
     }
     

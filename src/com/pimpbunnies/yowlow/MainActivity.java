@@ -14,7 +14,7 @@ import com.facebook.FacebookActivity;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.AbstractAction;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 import com.pimpbunnies.yowlow.ui.DeviceShaked;
 import com.pimpbunnies.yowlow.ui.Shaker;
 import com.pimpbunnies.yowlow.views.FacebookDieView;
@@ -47,7 +47,7 @@ public class MainActivity extends FacebookActivity {
 				View v = fDiceView.getChildAt(i);
 				if (v instanceof FacebookDieView) {
 					BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(this);
-					List<Guest> guests = db.getAllSelectedGuests();
+					List<Image> guests = db.getAllSelectedImages();
 					((FacebookDieView) v).shuffle(shuffle);
 				} else if (v instanceof RealDieView) {
 					((RealDieView) v).shuffle(shuffle);

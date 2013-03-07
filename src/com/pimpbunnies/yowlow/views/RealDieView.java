@@ -9,7 +9,7 @@ import java.util.Random;
 
 import com.pimpbunnies.yowlow.R;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 import com.pimpbunnies.yowlow.threedee.Cube;
 
 import android.content.Context;

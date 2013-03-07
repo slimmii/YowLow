@@ -19,15 +19,15 @@ import com.pimpbunnies.yowlow.MainActivity;
 import com.pimpbunnies.yowlow.R;
 import com.pimpbunnies.yowlow.R.drawable;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 import com.pimpbunnies.yowlow.threedee.Cube;
 
-public class FacebookDieView extends GenericDieView<Guest> {
+public class FacebookDieView extends GenericDieView<Image> {
 
 	private int fCounter = 0;
 	private boolean fShuffleing = false;
-	private Guest fResult;
-	protected List<Guest> fSelectedGuests;
+	private Image fResult;
+	protected List<Image> fSelectedGuests;
 
 	protected MainActivity fContext;
 
@@ -43,9 +43,11 @@ public class FacebookDieView extends GenericDieView<Guest> {
 
 		final Random rand = new Random();
 
-		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(getContext());
-		fSelectedGuests = db.getAllSelectedGuests();
-		db.close();
+		if (fSelectedGuests == null) {
+			BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(getContext());
+			fSelectedGuests = db.getAllSelectedImages();
+			db.close();
+		}
 
 		if (fSelectedGuests.size() > 0) {
 			long seed = System.nanoTime();
@@ -69,19 +71,19 @@ public class FacebookDieView extends GenericDieView<Guest> {
 		return bitmaps;
 	}
 
-	public Guest getRandomGuest() {
+	public Image getRandomGuest() {
 
 		final Random rand = new Random();
 		int max = fSelectedGuests.size();
 
 		int randomNum = rand.nextInt(max);
-		Guest guest = fSelectedGuests.get(randomNum);
+		Image guest = fSelectedGuests.get(randomNum);
 
 		return guest;
 	}
 
 	@Override
-	public Guest shuffle(final ShuffleCallback cb) {
+	public Image shuffle(final ShuffleCallback cb) {
 		final Handler handler = new Handler();
 
 		mView.setCube(new Cube(getFaces()));

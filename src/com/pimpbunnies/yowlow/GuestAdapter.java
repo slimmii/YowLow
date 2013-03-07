@@ -18,13 +18,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.android.Facebook;
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 
-public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
+public class GuestAdapter extends ArrayAdapter<Image> implements Filterable {
 
 	private Context fContext;
-	private List<Guest> fOrigionalValues;
-	private List<Guest> fObjects;
+	private List<Image> fOrigionalValues;
+	private List<Image> fObjects;
 	private Filter fFilter;
 	private String mFilterString = "";
 	private String mFilterSource = "";
@@ -45,11 +45,11 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		return mFilterSource;
 	}
 
-	public GuestAdapter(Context context, int viewResourceId, List<Guest> guests) {
+	public GuestAdapter(Context context, int viewResourceId, List<Image> guests) {
 		super(context, viewResourceId, guests);
 		fContext = context;
 		fOrigionalValues = guests;
-		fObjects = new ArrayList<Guest>(guests);
+		fObjects = new ArrayList<Image>(guests);
 	}
 
 	public static class ViewHolder {
@@ -74,7 +74,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		} else
 			holder = (ViewHolder) v.getTag();
 
-		final Guest guest = getItem(position);
+		final Image guest = getItem(position);
 		if (guest != null) {
 			holder.guest_list_item_name.setText(guest.getName());
 			byte[] byteArray = guest.getPicture();
@@ -89,28 +89,23 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 			}
 
 		}
-		if (guest.isSelected()) {
-			v.setBackgroundColor(Color.rgb(188, 217, 255));
-		} else {
-			v.setBackgroundColor(Color.WHITE);
-		}
 		return v;
 	}
 
 	@Override
-	public void remove(Guest object) {
+	public void remove(Image object) {
 		fOrigionalValues.remove(object);
 		this.notifyDataSetChanged();
 	}
 
 	@Override
-	public void add(Guest object) {
+	public void add(Image object) {
 		fOrigionalValues.add(object);
 		this.notifyDataSetChanged();
 	}
 
-	public void addAll(List<Guest> guests) {
-		for (Guest guest : guests) {
+	public void addAll(List<Image> guests) {
+		for (Image guest : guests) {
 			fOrigionalValues.add(guest);
 		}
 		this.notifyDataSetChanged();
@@ -122,7 +117,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 	}
 
 	@Override
-	public Guest getItem(int position) {
+	public Image getItem(int position) {
 		return fObjects.get(position);
 	}
 
@@ -149,9 +144,9 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 			}
 
 			String filter = mFilterString.toString().toLowerCase();
-			ArrayList<Guest> newValues = new ArrayList<Guest>();
+			ArrayList<Image> newValues = new ArrayList<Image>();
 			for (int i = 0; i < fOrigionalValues.size(); i++) {
-				Guest item = fOrigionalValues.get(i);
+				Image item = fOrigionalValues.get(i);
 				String[] parts = item.getName().split(" ");
 				if (!item.getPictureSource().startsWith(
 						mFilterSource)) {
@@ -175,7 +170,7 @@ public class GuestAdapter extends ArrayAdapter<Guest> implements Filterable {
 		@Override
 		protected void publishResults(CharSequence constraint,
 				FilterResults results) {
-			fObjects = (List<Guest>) results.values;
+			fObjects = (List<Image>) results.values;
 			Log.d("CustomArrayAdapter", String.valueOf(results.values));
 			Log.d("CustomArrayAdapter", String.valueOf(results.count));
 			notifyDataSetChanged();

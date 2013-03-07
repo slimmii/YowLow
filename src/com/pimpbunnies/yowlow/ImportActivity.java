@@ -53,7 +53,7 @@ import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.AbstractAction;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 
 public class ImportActivity extends FacebookActivity {
 
@@ -72,7 +72,7 @@ public class ImportActivity extends FacebookActivity {
 	
 	private boolean mImporting = false;
 	
-	private List<Guest> guests = new ArrayList<Guest>();
+	private List<Image> guests = new ArrayList<Image>();
 
 	private List<String> permissions = Arrays.asList("read_friendlists","user_about_me","friends_about_me","user_activities","friends_activities",
 			"user_birthday","friends_birthday","user_checkins","friends_checkins",
@@ -102,7 +102,7 @@ public class ImportActivity extends FacebookActivity {
 		System.out.println("ImportActivity.onSaveButtonClicked()");
 		
 		if (!mImporting) {		
-			Guest[] array = new Guest[guests.size()];
+			Image[] array = new Image[guests.size()];
 			array = guests.toArray(array);
 			new SaveOperation().execute(array);
  		} else {
@@ -111,9 +111,9 @@ public class ImportActivity extends FacebookActivity {
 
 	}
 
-	public List<Guest> getGuests() {
+	public List<Image> getGuests() {
 		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(ImportActivity.this);
-		List<Guest> guests = db.getAllGuests();
+		List<Image> guests = db.getAllImages();
 		if (db != null) {
 			db.close();
 		}      
@@ -186,7 +186,7 @@ public class ImportActivity extends FacebookActivity {
 							for(int i = 0 ; i < array.length() ; i++){
 								String id = array.getJSONObject(i).getString("id");
 								String name = array.getJSONObject(i).getString("name");
-								Guest guest = new Guest(0, name, "facebook://" + id, "", false);
+								Image guest = new Image(0, name, "facebook://" + id);
 								guests.add(guest);
 								System.out.println(guest.getName() + " added!");
 							}
@@ -195,9 +195,9 @@ public class ImportActivity extends FacebookActivity {
 						}
 						
 						// Stage 2 - Sorting both lists the same way.
-						Collections.sort(guests, new Comparator<Guest>() {
+						Collections.sort(guests, new Comparator<Image>() {
 							@Override
-							public int compare(Guest lhs, Guest rhs) {
+							public int compare(Image lhs, Image rhs) {
 								return lhs.getName().compareTo(rhs.getName());
 							}
 						});
@@ -207,7 +207,7 @@ public class ImportActivity extends FacebookActivity {
 						
 						// Stage 3 - We now want to asynchronously download the profile images of the guests
 						mDownloadImageOperation = new DownloadImageOperation(false, guests.size());
-						mDownloadImageOperation.execute(guests.toArray(new Guest[guests.size()]));
+						mDownloadImageOperation.execute(guests.toArray(new Image[guests.size()]));
 						//new CreateGuestsOperation().execute(array);
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -221,7 +221,7 @@ public class ImportActivity extends FacebookActivity {
 		}
 	}
 	
-	private class SaveOperation extends AsyncTask<Guest, Void, Void> {
+	private class SaveOperation extends AsyncTask<Image, Void, Void> {
 		private BirthdaySQLiteHelper fDb;
 		
 		public SaveOperation() {	
@@ -247,15 +247,15 @@ public class ImportActivity extends FacebookActivity {
 		}
 		
 		@Override
-		protected Void doInBackground(Guest... params) {
+		protected Void doInBackground(Image... params) {
 			for (int i=0;i<params.length;i++) {
-				fDb.addGuest(params[i]);
+				fDb.createImage(params[i]);
 			}
 			return null;
 		}
 	}
 
-	private class DownloadImageOperation extends AsyncTask<Guest, Bitmap, List<Bitmap>> {
+	private class DownloadImageOperation extends AsyncTask<Image, Bitmap, List<Bitmap>> {
 		private int mRequests;
 		private boolean mLowQuality;
 
@@ -265,9 +265,9 @@ public class ImportActivity extends FacebookActivity {
 		}
 
 		@Override
-		protected List<Bitmap> doInBackground(Guest... requests) {
+		protected List<Bitmap> doInBackground(Image... requests) {
 			List<Bitmap> bitmaps = new ArrayList<Bitmap>(); 
-			for (Guest request : requests) {
+			for (Image request : requests) {
 				
 				if (request.getPictureSource().startsWith("facebook://")) {
 					String facebookId = request.getPictureSource().replace("facebook://", "");
@@ -275,7 +275,7 @@ public class ImportActivity extends FacebookActivity {
 					Bitmap bm = getBitmapFromURL(pictureUrl);
 					Bitmap scaledBitmap = Bitmap.createScaledBitmap(bm, 64,64, false);
 					bm.recycle(); // Recycle the memory!
-					request.setPicture(scaledBitmap);
+					request.setPictureBitmap(scaledBitmap);
 					publishProgress(scaledBitmap);
 				}
 			}
@@ -408,8 +408,8 @@ public class ImportActivity extends FacebookActivity {
 				        public void onClick(DialogInterface dialog, int whichButton) {
 				        	String name = input.getText().toString();
 				            if (!name.toString().equals("")) {
-				            	Guest guest = new Guest(0, name, "image://" + selectedImageUri.getPath() , "", false);
-				            	guest.setPicture(scaledBitmap);
+				            	Image guest = new Image(0, name, "image://" + selectedImageUri.getPath());
+				            	guest.setPictureBitmap(scaledBitmap);
 				            	guests.add(guest);
 				            	fGuestAdapter.notifyDataSetChanged();
 				            	fGuestAdapter.filter();
@@ -527,28 +527,6 @@ public class ImportActivity extends FacebookActivity {
 		
 		fGuestAdapter = new GuestAdapter(this, R.layout.guest_list_item, guests);
 		activity_import_list.setAdapter(fGuestAdapter);
-		activity_import_list.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				System.out
-						.println("ImportActivity.onCreate(...).new OnItemClickListener() {...}.onItemClick()" + arg2);
-				Guest selectedGuest = fGuestAdapter.getItem(arg2);
-				selectedGuest.setSelected(!selectedGuest.isSelected());
-				
-				
-//				if (selectedGuest.isSelected()) {
-//				// Stage 3 - We now want to asynchronously download the profile images of the guests
-//				new DownloadImageOperation(false, 1).execute(new Guest[] {selectedGuest});
-//
-//				}
-
-				
-				
-				fGuestAdapter.notifyDataSetChanged();
-			}
-			
-		});
 		fGuestAdapter.filter();
 		
 		//    

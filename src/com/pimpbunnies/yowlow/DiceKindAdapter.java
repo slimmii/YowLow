@@ -15,7 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Image;
 
 public class DiceKindAdapter extends BaseAdapter {
 	/** Remember our context so we can use it when constructing views. */

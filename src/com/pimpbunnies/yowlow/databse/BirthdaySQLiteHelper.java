@@ -1,6 +1,7 @@
 package com.pimpbunnies.yowlow.databse;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.R.bool;
@@ -10,155 +11,180 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.pimpbunnies.yowlow.model.Guest;
+import com.pimpbunnies.yowlow.model.Group;
+import com.pimpbunnies.yowlow.model.Image;
 
 public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 
-  public BirthdaySQLiteHelper(Context context) {
-    super(context, DATABASE_NAME, null, DATABASE_VERSION);
-  }
+	public BirthdaySQLiteHelper(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	}
 
-  // All Static variables
-  // Database Version
-  private static final int DATABASE_VERSION = 1;
+	// All Static variables
+	// Database Version
+	private static final int DATABASE_VERSION = 1;
 
-  // Database Name
-  private static final String DATABASE_NAME = "alcoholizer";
+	// Database Name
+	private static final String DATABASE_NAME = "alcoholizer";
 
-  // Contacts table name
-  private static final String TABLE_GUESTS = "guests";
+	// Contacts table name
+	private static final String TABLE_IMAGES = "images";
+	private static final String TABLE_GROUPS = "groups";
+	private static final String TABLE_IMAGES_GROUPS = "images_groups";
 
-  // Contacts Table Columns names
-  private static final String KEY_ID = "id";
-  private static final String KEY_NAME = "name";
-  private static final String KEY_PICTURE = "picture";
-  private static final String KEY_PICTURE_SOURCE = "picture_source";
-  private static final String KEY_GROUP = "dice_group";
-  private static final String KEY_SELECTED = "selected";
+	// Contacts Table Columns names
+	private static final String KEY_IMAGE_ID = "id";
+	private static final String KEY_IMAGE_NAME = "name";
+	private static final String KEY_IMAGE_PICTURE = "picture";
+	private static final String KEY_IMAGE_PICTURE_SOURCE = "picture_source";
 
-  @Override
-  public void onCreate(SQLiteDatabase db) {
-    String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_GUESTS + "("
-        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, "
-        + KEY_PICTURE + " BLOB, "
-        + KEY_PICTURE_SOURCE + " TEXT, "
-        + KEY_GROUP + " TEXT, "
-        + KEY_SELECTED + " INTEGER" 
-        + ")";
-    db.execSQL(CREATE_CONTACTS_TABLE);
-  }
-  
-  public void flush() {
-    SQLiteDatabase db = this.getWritableDatabase();
-    db.execSQL("DELETE FROM " + TABLE_GUESTS + ";");
-    db.close();
-  }
+	private static final String KEY_GROUP_ID = "id";
+	private static final String KEY_GROUP_NAME = "name";
 
-  @Override
-  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    // Drop older table if existed
-    db.execSQL("DROP TABLE IF EXISTS " + TABLE_GUESTS);
-    // Create tables again
-    onCreate(db);
-  }
+	private static final String KEY_IMAGE_FOREIGN_ID = "image_id";
+	private static final String KEY_GROUP_FOREIGN_ID = "group_id";
 
-  // Adding new Guest
-  public void addGuest(Guest guest) {
-    SQLiteDatabase db = this.getWritableDatabase();
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		String CREATE_IMAGE_TABLE = "CREATE TABLE " + TABLE_IMAGES + "("
+				+ KEY_IMAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ KEY_IMAGE_NAME + " TEXT, " + KEY_IMAGE_PICTURE + " BLOB, "
+				+ KEY_IMAGE_PICTURE_SOURCE + " TEXT" + ")";
+		String CREATE_GROUP_TABLE = "CREATE TABLE " + TABLE_GROUPS + "("
+				+ KEY_GROUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ KEY_GROUP_NAME + " TEXT" + ")";
+		String CREATE_IMAGE_GROUP_TABLE = "CREATE TABLE " + TABLE_IMAGES_GROUPS
+				+ "(" + KEY_IMAGE_FOREIGN_ID + " INTEGER,"
+				+ KEY_GROUP_FOREIGN_ID + " INTEGER" + ")";
 
-    ContentValues values = new ContentValues();
-    values.put(KEY_NAME, guest.getName()); // Guest Name
-    values.put(KEY_PICTURE, guest.getPicture()); // Guest Picture
-    values.put(KEY_PICTURE_SOURCE, guest.getPictureSource()); // Guest Picture
-    values.put(KEY_GROUP, guest.getGroup()); // Guest Group
-    values.put(KEY_SELECTED, (guest.isSelected()) ? 1 : 0); // Guest Picture
-    
-    // Inserting Row
-    db.insert(TABLE_GUESTS, null, values);
-    db.close(); // Closing database connection
-  }
-//
-//  // Getting single Guest
-//  public Guest getGuest(int id) {
-//    SQLiteDatabase db = this.getReadableDatabase();
-//
-//    Cursor cursor = db.query(TABLE_GUESTS, new String[] { KEY_ID,
-//        KEY_NAME, KEY_PICTURE, KEY_PICTURE_SOURCE, KEY_GROUP ,KEY_SELECTED }, KEY_ID + "=?",
-//        new String[] { String.valueOf(id) }, null, null, null, null);
-//    if (cursor != null)
-//      cursor.moveToFirst();
-//    Guest contact = new Guest(Integer.parseInt(cursor.getString(0)),
-//        cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4)!=0);
-//    db.close();
-//    return contact;
-//  }
+		db.execSQL(CREATE_IMAGE_TABLE);
+		db.execSQL(CREATE_GROUP_TABLE);
+		db.execSQL(CREATE_IMAGE_GROUP_TABLE);
+	}
 
-  public int getGuestCount() {
-    String countQuery = "SELECT  * FROM " + TABLE_GUESTS;
-    SQLiteDatabase db = this.getReadableDatabase();
-    Cursor cursor = db.rawQuery(countQuery, null);
-    cursor.close();
-    db.close();
-    // return count
-    return cursor.getCount();
-  }
+	public void flush() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("DELETE FROM " + TABLE_IMAGES + ";");
+		db.execSQL("DELETE FROM " + TABLE_GROUPS + ";");
+		db.execSQL("DELETE FROM " + TABLE_IMAGES_GROUPS + ";");
+		db.close();
+	}
 
-  public List<Guest> getAllSelectedGuests() {
-	    List<Guest> guestList = new ArrayList<Guest>();
-	    // Select All Query
-	    String selectQuery = "SELECT  * FROM " + TABLE_GUESTS +
-	    		" WHERE " + KEY_SELECTED + "='1'";
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// Drop older table if existed
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_GROUPS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGES_GROUPS);
+		// Create tables again
+		onCreate(db);
+	}
 
-	    SQLiteDatabase db = this.getWritableDatabase();
-	    Cursor cursor = db.rawQuery(selectQuery, null);
+	public void createImage(Image guest) {
+		SQLiteDatabase db = this.getWritableDatabase();
 
-	    // looping through all rows and adding to list
-	    if (cursor.moveToFirst()) {
-	      do {
-	        Guest guest = new Guest();
-	        guest.setId(Integer.parseInt(cursor.getString(0)));
-	        guest.setName(cursor.getString(1));
-	        guest.setPicture(cursor.getBlob(2));
-	        guest.setPictureSource(cursor.getString(3));
-	        guest.setGroup(cursor.getString(4));
-	        guest.setSelected(cursor.getInt(5)!=0);
-	        // Adding contact to list
-	        guestList.add(guest);
-	      } while (cursor.moveToNext());
-	    }
+		ContentValues values = new ContentValues();
+		values.put(KEY_IMAGE_NAME, guest.getName());
+		values.put(KEY_IMAGE_PICTURE, guest.getPicture());
+		values.put(KEY_IMAGE_PICTURE_SOURCE, guest.getPictureSource());
 
-	    db.close();
-	    
-	    // return contact list
-	    return guestList;
-	  }
-  
-  public List<Guest> getAllGuests() {
-    List<Guest> guestList = new ArrayList<Guest>();
-    // Select All Query
-    String selectQuery = "SELECT  * FROM " + TABLE_GUESTS;
+		// Inserting Row
+		db.insert(TABLE_IMAGES, null, values);
+		db.close(); // Closing database connection
+	}
 
-    SQLiteDatabase db = this.getWritableDatabase();
-    Cursor cursor = db.rawQuery(selectQuery, null);
+	public void createGroup(Group group) {
+		SQLiteDatabase db = this.getWritableDatabase();
 
-    // looping through all rows and adding to list
-    if (cursor.moveToFirst()) {
-      do {
-        Guest guest = new Guest();
-        guest.setId(Integer.parseInt(cursor.getString(0)));
-        guest.setName(cursor.getString(1));
-        guest.setPicture(cursor.getBlob(2));
-        guest.setPictureSource(cursor.getString(3));
-        guest.setGroup(cursor.getString(4));
-        guest.setSelected(cursor.getInt(5)!=0);
-        // Adding contact to list
-        guestList.add(guest);
-      } while (cursor.moveToNext());
-    }
+		ContentValues values = new ContentValues();
+		values.put(KEY_GROUP_NAME, group.getName());
 
-    db.close();
-    
-    // return contact list
-    return guestList;
-  }
+		// Inserting Row
+		db.insert(TABLE_GROUPS, null, values);
+		db.close(); // Closing database connection
+	}
+
+	public int getImageCount() {
+		String countQuery = "SELECT  * FROM " + TABLE_IMAGES;
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery(countQuery, null);
+		cursor.close();
+		db.close();
+		// return count
+		return cursor.getCount();
+	}
+
+	public List<Image> getAllSelectedImages() {
+		List<Image> imageList = new ArrayList<Image>();
+		// Select All Query
+		String selectQuery = "SELECT  * FROM " + TABLE_IMAGES + "";
+		// " WHERE " + KEY_SELECTED + "='1'";
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Image image = new Image();
+				image.setId(Integer.parseInt(cursor.getString(0)));
+				image.setName(cursor.getString(1));
+				image.setPicture(cursor.getBlob(2));
+				image.setPictureSource(cursor.getString(3));
+				// Adding contact to list
+				imageList.add(image);
+			} while (cursor.moveToNext());
+		}
+
+		db.close();
+		return imageList;
+	}
+
+	public List<Group> getGroups() {
+		List<Group> groupList = new ArrayList<Group>();
+		// Select All Query
+		String selectQuery = "SELECT  * FROM " + TABLE_GROUPS;
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Group group = new Group();
+				group.setId(Integer.parseInt(cursor.getString(0)));
+				group.setName(cursor.getString(1));
+				groupList.add(group);
+			} while (cursor.moveToNext());
+		}
+
+		db.close();
+		return groupList;
+	}	
+	
+	public List<Image> getAllImages() {
+		List<Image> imageList = new ArrayList<Image>();
+		// Select All Query
+		String selectQuery = "SELECT  * FROM " + TABLE_IMAGES;
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Image image = new Image();
+				image.setId(Integer.parseInt(cursor.getString(0)));
+				image.setName(cursor.getString(1));
+				image.setPicture(cursor.getBlob(2));
+				image.setPictureSource(cursor.getString(3));
+				imageList.add(image);
+			} while (cursor.moveToNext());
+		}
+
+		db.close();
+
+		// return contact list
+		return imageList;
+	}
 }
