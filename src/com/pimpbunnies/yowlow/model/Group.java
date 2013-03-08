@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Group {
+	private static int CURRENT_INDEX = 0;
 	private int mId;
 	private String mName;
 	
@@ -15,6 +16,10 @@ public class Group {
 		this();
 		this.mId = id;
 		this.mName = name;
+	}	
+	
+	public Group(String name) {
+		this(CURRENT_INDEX++, name);
 	}
 	
 	public int getId() {

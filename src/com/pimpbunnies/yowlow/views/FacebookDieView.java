@@ -19,6 +19,7 @@ import com.pimpbunnies.yowlow.MainActivity;
 import com.pimpbunnies.yowlow.R;
 import com.pimpbunnies.yowlow.R.drawable;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
+import com.pimpbunnies.yowlow.model.Group;
 import com.pimpbunnies.yowlow.model.Image;
 import com.pimpbunnies.yowlow.threedee.Cube;
 
@@ -45,7 +46,7 @@ public class FacebookDieView extends GenericDieView<Image> {
 
 		if (fSelectedGuests == null) {
 			BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(getContext());
-			fSelectedGuests = db.getAllSelectedImages();
+			fSelectedGuests = db.getImages(new Group(0,"Default"));
 			db.close();
 		}
 

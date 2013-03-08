@@ -97,7 +97,8 @@ public class ImportActivity extends FacebookActivity {
 
 	private GuestAdapter fGuestAdapter;
 	private boolean fFacebookLinkActive = false;
-
+	private BirthdaySQLiteHelper mDb = new BirthdaySQLiteHelper(ImportActivity.this);
+	
 	public void onSaveButtonClicked() {
 		System.out.println("ImportActivity.onSaveButtonClicked()");
 		
@@ -112,11 +113,7 @@ public class ImportActivity extends FacebookActivity {
 	}
 
 	public List<Image> getGuests() {
-		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(ImportActivity.this);
-		List<Image> guests = db.getAllImages();
-		if (db != null) {
-			db.close();
-		}      
+		List<Image> guests = mDb.getImages();
 		return guests;
 	}
 
@@ -126,10 +123,8 @@ public class ImportActivity extends FacebookActivity {
 			mDownloadImageOperation.cancel(true);
 			fDownloadProgressBar.setMax(0);
 			fDownloadProgressBar.setProgress(0);
-		}
-		
-		BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(ImportActivity.this);
-		db.flush();
+		}		
+		mDb.flush();
 		guests.clear();
 		fGuestAdapter.filter();
 		
@@ -186,7 +181,7 @@ public class ImportActivity extends FacebookActivity {
 							for(int i = 0 ; i < array.length() ; i++){
 								String id = array.getJSONObject(i).getString("id");
 								String name = array.getJSONObject(i).getString("name");
-								Image guest = new Image(0, name, "facebook://" + id);
+								Image guest = new Image(name, "facebook://" + id);
 								guests.add(guest);
 								System.out.println(guest.getName() + " added!");
 							}
@@ -225,8 +220,6 @@ public class ImportActivity extends FacebookActivity {
 		private BirthdaySQLiteHelper fDb;
 		
 		public SaveOperation() {	
-			fDb = new BirthdaySQLiteHelper(ImportActivity.this);
-
 		}
 		
 		@Override
@@ -261,7 +254,7 @@ public class ImportActivity extends FacebookActivity {
 
 		public DownloadImageOperation(boolean lowQuality, int i) {
 			this.mRequests = i;
-			mLowQuality = lowQuality;
+			this.mLowQuality = lowQuality;
 		}
 
 		@Override
@@ -276,6 +269,7 @@ public class ImportActivity extends FacebookActivity {
 					Bitmap scaledBitmap = Bitmap.createScaledBitmap(bm, 64,64, false);
 					bm.recycle(); // Recycle the memory!
 					request.setPictureBitmap(scaledBitmap);
+					mDb.createImage(request);
 					publishProgress(scaledBitmap);
 				}
 			}
@@ -311,6 +305,7 @@ public class ImportActivity extends FacebookActivity {
 		@Override
 		protected void onPostExecute(List<Bitmap> bitmaps) {
 			super.onPostExecute(bitmaps);
+			mDb.close();
 			mImporting = false;
 		}
 	}
@@ -408,9 +403,10 @@ public class ImportActivity extends FacebookActivity {
 				        public void onClick(DialogInterface dialog, int whichButton) {
 				        	String name = input.getText().toString();
 				            if (!name.toString().equals("")) {
-				            	Image guest = new Image(0, name, "image://" + selectedImageUri.getPath());
+				            	Image guest = new Image(name, "image://" + selectedImageUri.getPath());
 				            	guest.setPictureBitmap(scaledBitmap);
 				            	guests.add(guest);
+				            	mDb.createImage(guest);
 				            	fGuestAdapter.notifyDataSetChanged();
 				            	fGuestAdapter.filter();
 				            } else {
@@ -448,7 +444,6 @@ public class ImportActivity extends FacebookActivity {
 		actionBar.addAction(new CameraAction());
 		actionBar.addAction(new ImportAction());
 		actionBar.addAction(new ClearAction());		
-		actionBar.addAction(new SaveAction());
 		
         actionBar.setHomeAction(new IntentAction(this, MainActivity.createIntent(this), R.drawable.ic_title_home_default));
         actionBar.setDisplayHomeAsUpEnabled(false);

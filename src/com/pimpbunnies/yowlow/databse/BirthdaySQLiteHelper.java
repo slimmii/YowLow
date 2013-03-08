@@ -47,11 +47,11 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_IMAGE_TABLE = "CREATE TABLE " + TABLE_IMAGES + "("
-				+ KEY_IMAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ KEY_IMAGE_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_IMAGE_NAME + " TEXT, " + KEY_IMAGE_PICTURE + " BLOB, "
 				+ KEY_IMAGE_PICTURE_SOURCE + " TEXT" + ")";
 		String CREATE_GROUP_TABLE = "CREATE TABLE " + TABLE_GROUPS + "("
-				+ KEY_GROUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ KEY_GROUP_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_GROUP_NAME + " TEXT" + ")";
 		String CREATE_IMAGE_GROUP_TABLE = "CREATE TABLE " + TABLE_IMAGES_GROUPS
 				+ "(" + KEY_IMAGE_FOREIGN_ID + " INTEGER,"
@@ -67,6 +67,13 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		db.execSQL("DELETE FROM " + TABLE_IMAGES + ";");
 		db.execSQL("DELETE FROM " + TABLE_GROUPS + ";");
 		db.execSQL("DELETE FROM " + TABLE_IMAGES_GROUPS + ";");
+		
+		ContentValues values = new ContentValues();
+		values.put(KEY_GROUP_ID, 0);
+		values.put(KEY_GROUP_NAME, "Default");
+
+		// Inserting Row
+		db.insert(TABLE_GROUPS, null, values);		
 		db.close();
 	}
 
@@ -80,23 +87,27 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public void createImage(Image guest) {
+	public void createImage(Image image) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_IMAGE_NAME, guest.getName());
-		values.put(KEY_IMAGE_PICTURE, guest.getPicture());
-		values.put(KEY_IMAGE_PICTURE_SOURCE, guest.getPictureSource());
+		values.put(KEY_IMAGE_ID, image.getId());
+		values.put(KEY_IMAGE_NAME, image.getName());
+		values.put(KEY_IMAGE_PICTURE, image.getPicture());
+		values.put(KEY_IMAGE_PICTURE_SOURCE, image.getPictureSource());
 
 		// Inserting Row
 		db.insert(TABLE_IMAGES, null, values);
 		db.close(); // Closing database connection
+		
+		addImageToGroup(image, new Group(0, "Default"));
 	}
 
 	public void createGroup(Group group) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
+		values.put(KEY_GROUP_ID, group.getId());
 		values.put(KEY_GROUP_NAME, group.getName());
 
 		// Inserting Row
@@ -113,31 +124,23 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		// return count
 		return cursor.getCount();
 	}
-
-	public List<Image> getAllSelectedImages() {
-		List<Image> imageList = new ArrayList<Image>();
-		// Select All Query
-		String selectQuery = "SELECT  * FROM " + TABLE_IMAGES + "";
-		// " WHERE " + KEY_SELECTED + "='1'";
-
+	
+	public void addImageToGroup(Image image, Group group) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor cursor = db.rawQuery(selectQuery, null);
 
-		// looping through all rows and adding to list
-		if (cursor.moveToFirst()) {
-			do {
-				Image image = new Image();
-				image.setId(Integer.parseInt(cursor.getString(0)));
-				image.setName(cursor.getString(1));
-				image.setPicture(cursor.getBlob(2));
-				image.setPictureSource(cursor.getString(3));
-				// Adding contact to list
-				imageList.add(image);
-			} while (cursor.moveToNext());
-		}
+		ContentValues values = new ContentValues();
+		values.put(KEY_IMAGE_FOREIGN_ID, image.getId());
+		values.put(KEY_GROUP_FOREIGN_ID, group.getId());
 
+		db.insert(TABLE_IMAGES_GROUPS, null, values);
+		db.close(); // Closing database connection
+	}
+	
+	public void removeImageFromGroup(Image image, Group group) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String[] ids = {String.valueOf(image.getId()), String.valueOf(group.getId())};
+		db.delete("rows" , KEY_IMAGE_FOREIGN_ID + "=? AND " + KEY_GROUP_FOREIGN_ID +"=?" , ids );
 		db.close();
-		return imageList;
 	}
 
 	public List<Group> getGroups() {
@@ -160,14 +163,15 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 
 		db.close();
 		return groupList;
-	}	
+	}
 	
-	public List<Image> getAllImages() {
+	public List<Image> getImages() {
 		List<Image> imageList = new ArrayList<Image>();
 		// Select All Query
 		String selectQuery = "SELECT  * FROM " + TABLE_IMAGES;
-
+		
 		SQLiteDatabase db = this.getWritableDatabase();
+		
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
@@ -185,6 +189,34 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		db.close();
 
 		// return contact list
+		return imageList;
+	}
+	
+	public List<Image> getImages(Group group) {
+		List<Image> imageList = new ArrayList<Image>();
+		String selectQuery ="SELECT i.* " +
+		"FROM " + TABLE_IMAGES + " i " +
+		"JOIN " + TABLE_IMAGES_GROUPS + " ig ON i." + KEY_IMAGE_ID + " = ig." + KEY_IMAGE_FOREIGN_ID + " " +
+		"JOIN " + TABLE_GROUPS + " g ON g." + KEY_GROUP_ID + "=ig." + KEY_GROUP_FOREIGN_ID + " " +
+		"WHERE g.id=?";
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, new String[] {	String.valueOf(group.getId())});
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Image image = new Image();
+				image.setId(Integer.parseInt(cursor.getString(0)));
+				image.setName(cursor.getString(1));
+				image.setPicture(cursor.getBlob(2));
+				image.setPictureSource(cursor.getString(3));
+				// Adding contact to list
+				imageList.add(image);
+			} while (cursor.moveToNext());
+		}
+
+		db.close();
 		return imageList;
 	}
 }
