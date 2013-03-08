@@ -82,13 +82,13 @@ public class OpenGLRenderer implements Renderer {
 		//Drawing
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);		//Move 5 units into the screen
 		gl.glScalef(1.1f, 1.1f, 1.1f); 			//Scale the Cube to 80 percent, otherwise it would be too large for the screen
-		
+						
 		//Rotate around the axis based on the rotation matrix (rotation, x, y, z)
-		gl.glRotatef(xrot, 0.0f, 1.0f, 0.0f);	//X
-		gl.glRotatef(yrot, 1.0f, 1.0f, 1.0f);	//Y
-		gl.glRotatef(zrot, 0.0f, 1.0f, 0.0f);	//Z
-				
+		
 		if (cube != null) {
+			gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);	//X
+			gl.glRotatef(yrot, 0.0f, 1.0f, 0.0f);	//Y
+			gl.glRotatef(yrot, 0.0f, 1.0f, 0.0f);	//Y
 			cube.draw(gl);							//Draw the Cube	
 			
 			//Change rotation factors (nice rotation)

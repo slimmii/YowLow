@@ -40,7 +40,7 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 		this.addView(mView);		
 	}
 	
-	private Bitmap[] getDefaultFaces() {
+	public Bitmap[] getDefaultFaces() {
 		Bitmap[] bitmaps = new Bitmap[6];
 		for (int i=0; i < 6 ; i++) {
 			bitmaps[i] = BitmapFactory.decodeResource(getResources(), R.drawable.grumpy);		

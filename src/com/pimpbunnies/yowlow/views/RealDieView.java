@@ -34,6 +34,10 @@ public class RealDieView extends GenericDieView<Integer> {
 			shuffle();
 		}
 	};
+	
+	public Bitmap[] getDefaultFaces() {
+		return getFaces();
+	}
 
 	public Bitmap[] getFaces() {
 		ArrayList<Bitmap> maps = new ArrayList<Bitmap>();
