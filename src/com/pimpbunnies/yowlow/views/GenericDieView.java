@@ -1,5 +1,7 @@
 package com.pimpbunnies.yowlow.views;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,6 +12,7 @@ import android.view.View.OnTouchListener;
 import android.widget.LinearLayout;
 
 import com.pimpbunnies.yowlow.R;
+import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.threedee.Cube;
 import com.pimpbunnies.yowlow.threedee.GLView;
 
@@ -23,7 +26,7 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 	public GenericDieView(Context context) {
 		super(context);
 		mContext = context;
-		mCube = new Cube(getFaces());		
+		mCube = new Cube(getDefaultFaces());		
 		mView = new GLView(mContext, mCube);
 		
 		android.support.v7.widget.GridLayout.LayoutParams params = new android.support.v7.widget.GridLayout.LayoutParams();
@@ -37,6 +40,15 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 		this.addView(mView);		
 	}
 	
+	private Bitmap[] getDefaultFaces() {
+		Bitmap[] bitmaps = new Bitmap[6];
+		for (int i=0; i < 6 ; i++) {
+			bitmaps[i] = BitmapFactory.decodeResource(getResources(), R.drawable.grumpy);		
+		}
+		
+		return bitmaps;
+	}
+
 	public abstract Bitmap[] getFaces();
 		
 	public T shuffle() {

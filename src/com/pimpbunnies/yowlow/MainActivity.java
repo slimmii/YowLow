@@ -26,7 +26,7 @@ import com.pimpbunnies.yowlow.views.ShuffleCallback;
 public class MainActivity extends FacebookActivity {
 
 	private GridLayout fDiceView;
-
+	private BirthdaySQLiteHelper mDb;
 	private boolean fRollingAllDice = false;
 
 	ShuffleCallback shuffle = new ShuffleCallback() {
@@ -47,8 +47,7 @@ public class MainActivity extends FacebookActivity {
 			for (int i = 0; i < fDiceView.getChildCount(); i++) {
 				View v = fDiceView.getChildAt(i);
 				if (v instanceof FacebookDieView) {
-					BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(this);
-					List<Image> guests = db.getImages(new Group(0,"Default"));
+					List<Image> guests = mDb.getImages(new Group(0,"Default"));
 					((FacebookDieView) v).shuffle(shuffle);
 				} else if (v instanceof RealDieView) {
 					((RealDieView) v).shuffle(shuffle);
@@ -98,6 +97,8 @@ public class MainActivity extends FacebookActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		fDiceView = (GridLayout) findViewById(R.id.activity_main_dice_view);
+		
+		mDb = new BirthdaySQLiteHelper(this);
 
 		final ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
 		// actionBar.setHomeAction(new IntentAction(this, createIntent(this),
@@ -114,6 +115,8 @@ public class MainActivity extends FacebookActivity {
 				onRollAllDice();
 			}
 		}, 2.5f);
+		
+		
 	}
 
 	private class AddDiceAction extends AbstractAction {
@@ -124,7 +127,7 @@ public class MainActivity extends FacebookActivity {
 
 		@Override
 		public void performAction(View view) {
-			DiceKindDialog dialog = new DiceKindDialog(MainActivity.this);
+			DiceKindDialog dialog = new DiceKindDialog(MainActivity.this, mDb);
 			dialog.show();
 		}
 

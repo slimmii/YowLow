@@ -17,5 +17,6 @@
     <string name="title_activity_import">ImportActivity</string>
     <string name="activity_main_random_button_text">Random Guest</string>
     <string name="title_activity_camera">Camera</string>
+    <string name="dialog_imagemanage_add_button">Add</string>
 
 </resources>

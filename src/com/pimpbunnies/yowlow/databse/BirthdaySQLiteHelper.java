@@ -99,8 +99,6 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		// Inserting Row
 		db.insert(TABLE_IMAGES, null, values);
 		db.close(); // Closing database connection
-		
-		addImageToGroup(image, new Group(0, "Default"));
 	}
 
 	public void createGroup(Group group) {

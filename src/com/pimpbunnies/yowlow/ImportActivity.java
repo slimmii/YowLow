@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
@@ -163,7 +164,7 @@ public class ImportActivity extends FacebookActivity {
 			guests.clear();
 
 			// make request to the /me API
-			Request.executeGraphPathRequestAsync(session, "/102909926563430/attending",
+			Request.executeGraphPathRequestAsync(session, "/me/friends",
 					new Callback() {
 				@Override
 				public void onCompleted(Response response) {
@@ -522,6 +523,20 @@ public class ImportActivity extends FacebookActivity {
 		
 		fGuestAdapter = new GuestAdapter(this, R.layout.guest_list_item, guests);
 		activity_import_list.setAdapter(fGuestAdapter);
+		
+		activity_import_list.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Image image = (Image) arg0.getItemAtPosition(arg2);
+				ImageManageDialog dialog = new ImageManageDialog(ImportActivity.this, image, mDb);
+				dialog.show();
+			}
+
+		});
+		
+		
 		fGuestAdapter.filter();
 		
 		//    

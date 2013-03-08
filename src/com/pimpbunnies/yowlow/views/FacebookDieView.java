@@ -1,23 +1,15 @@
 package com.pimpbunnies.yowlow.views;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
-import android.view.MotionEvent;
-import android.view.View;
 
 import com.pimpbunnies.yowlow.MainActivity;
 import com.pimpbunnies.yowlow.R;
-import com.pimpbunnies.yowlow.R.drawable;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Group;
 import com.pimpbunnies.yowlow.model.Image;
@@ -29,12 +21,15 @@ public class FacebookDieView extends GenericDieView<Image> {
 	private boolean fShuffleing = false;
 	private Image fResult;
 	protected List<Image> fSelectedGuests;
-
+	private Group mGroup;
+	private BirthdaySQLiteHelper mDb;
 	protected MainActivity fContext;
 
-	public FacebookDieView(MainActivity context) {
+	public FacebookDieView(MainActivity context, Group group) {
 		super(context);
+		this.mGroup = group;
 		this.fContext = context;
+		mDb = new BirthdaySQLiteHelper(getContext());
 	}
 
 	@Override
@@ -44,11 +39,7 @@ public class FacebookDieView extends GenericDieView<Image> {
 
 		final Random rand = new Random();
 
-		if (fSelectedGuests == null) {
-			BirthdaySQLiteHelper db = new BirthdaySQLiteHelper(getContext());
-			fSelectedGuests = db.getImages(new Group(0,"Default"));
-			db.close();
-		}
+		fSelectedGuests = mDb.getImages(mGroup);
 
 		if (fSelectedGuests.size() > 0) {
 			long seed = System.nanoTime();
