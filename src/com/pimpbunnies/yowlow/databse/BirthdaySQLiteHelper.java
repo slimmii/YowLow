@@ -47,11 +47,11 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_IMAGE_TABLE = "CREATE TABLE " + TABLE_IMAGES + "("
-				+ KEY_IMAGE_ID + " INTEGER PRIMARY KEY,"
+				+ KEY_IMAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ KEY_IMAGE_NAME + " TEXT, " + KEY_IMAGE_PICTURE + " BLOB, "
 				+ KEY_IMAGE_PICTURE_SOURCE + " TEXT" + ")";
 		String CREATE_GROUP_TABLE = "CREATE TABLE " + TABLE_GROUPS + "("
-				+ KEY_GROUP_ID + " INTEGER PRIMARY KEY,"
+				+ KEY_GROUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ KEY_GROUP_NAME + " TEXT" + ")";
 		String CREATE_IMAGE_GROUP_TABLE = "CREATE TABLE " + TABLE_IMAGES_GROUPS
 				+ "(" + KEY_IMAGE_FOREIGN_ID + " INTEGER,"
@@ -67,13 +67,6 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		db.execSQL("DELETE FROM " + TABLE_IMAGES + ";");
 		db.execSQL("DELETE FROM " + TABLE_GROUPS + ";");
 		db.execSQL("DELETE FROM " + TABLE_IMAGES_GROUPS + ";");
-		
-		ContentValues values = new ContentValues();
-		values.put(KEY_GROUP_ID, 0);
-		values.put(KEY_GROUP_NAME, "Default");
-
-		// Inserting Row
-		db.insert(TABLE_GROUPS, null, values);		
 		db.close();
 	}
 
@@ -86,18 +79,27 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		// Create tables again
 		onCreate(db);
 	}
+	
+	public static int safeLongToInt(long l) {
+	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+	        throw new IllegalArgumentException
+	            (l + " cannot be cast to int without changing its value.");
+	    }
+	    return (int) l;
+	}
 
 	public void createImage(Image image) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_IMAGE_ID, image.getId());
 		values.put(KEY_IMAGE_NAME, image.getName());
 		values.put(KEY_IMAGE_PICTURE, image.getPicture());
 		values.put(KEY_IMAGE_PICTURE_SOURCE, image.getPictureSource());
 
 		// Inserting Row
-		db.insert(TABLE_IMAGES, null, values);
+		long rowId = db.insert(TABLE_IMAGES, null, values);
+		image.setId(safeLongToInt(rowId));
+		
 		db.close(); // Closing database connection
 	}
 
@@ -105,11 +107,11 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_GROUP_ID, group.getId());
 		values.put(KEY_GROUP_NAME, group.getName());
 
 		// Inserting Row
-		db.insert(TABLE_GROUPS, null, values);
+		long rowId = db.insert(TABLE_GROUPS, null, values);
+		group.setId(safeLongToInt(rowId));
 		db.close(); // Closing database connection
 	}
 

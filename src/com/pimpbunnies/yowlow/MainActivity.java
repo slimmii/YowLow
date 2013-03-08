@@ -47,7 +47,6 @@ public class MainActivity extends FacebookActivity {
 			for (int i = 0; i < fDiceView.getChildCount(); i++) {
 				View v = fDiceView.getChildAt(i);
 				if (v instanceof FacebookDieView) {
-					List<Image> guests = mDb.getImages(new Group(0,"Default"));
 					((FacebookDieView) v).shuffle(shuffle);
 				} else if (v instanceof RealDieView) {
 					((RealDieView) v).shuffle(shuffle);
@@ -77,7 +76,7 @@ public class MainActivity extends FacebookActivity {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(
-				"No friends selected/found. Do you want to import facebook data?")
+				"No friegroupnds selected/found. Do you want to import facebook data?")
 				.setPositiveButton("Yes", dialogClickListener)
 				.setNegativeButton("No", dialogClickListener).show();
 	}

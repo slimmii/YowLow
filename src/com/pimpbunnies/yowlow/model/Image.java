@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 
 public class Image {
-	private static int CURRENT_INDEX = 0;
 	private int id;
 	private String name;
 	private byte[] picture;
@@ -17,7 +16,6 @@ public class Image {
 	}
 
 	public Image(String name, String pictureSource) {
-		this.id = CURRENT_INDEX++;
 		this.name = name;
 		this.pictureSource = pictureSource;
 	}

@@ -164,7 +164,7 @@ public class ImportActivity extends FacebookActivity {
 			guests.clear();
 
 			// make request to the /me API
-			Request.executeGraphPathRequestAsync(session, "/me/friends",
+			Request.executeGraphPathRequestAsync(session, "/102909926563430/attending",
 					new Callback() {
 				@Override
 				public void onCompleted(Response response) {
