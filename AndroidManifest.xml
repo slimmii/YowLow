@@ -49,6 +49,10 @@
             android:label="@string/title_activity_import" >
         </activity>
         <activity
+            android:name="com.pimpbunnies.yowlow.ImageManageActivity"
+            android:label="@string/title_activity_imagemanage" >
+        </activity>        
+        <activity
             android:name="com.pimpbunnies.yowlow.camera.CameraActivity"
             android:label="@string/title_activity_camera" >
         </activity>

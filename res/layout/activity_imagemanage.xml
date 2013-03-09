@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        style="@style/ActionBar" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/activity_imagemanage_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_missing_person" />
+
+        <TextView
+            android:id="@+id/activity_imagemanage_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1.0"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip"
+            android:text="bla" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/activity_imagemanage_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1.0"         
+        />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="horizontal"
+        >
+
+        <EditText
+            android:id="@+id/dialog_imagemanage_groupname_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+		/>
+
+        <Button
+            android:id="@+id/dialog_imagemanage_groupname_add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="@string/dialog_imagemanage_create_button" />
+    </LinearLayout>
+
+</LinearLayout>

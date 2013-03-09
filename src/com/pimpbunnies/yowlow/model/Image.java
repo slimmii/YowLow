@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Image {
+public class Image implements Parcelable {
 	private int id;
 	private String name;
 	private byte[] picture;
@@ -68,7 +70,7 @@ public class Image {
 	public void setPictureSource(String pictureSource) {
 		this.pictureSource = pictureSource;
 	}
-	
+
 	private byte[] getBitmapAsByteArray(Bitmap bitmap) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -99,12 +101,41 @@ public class Image {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
-	} 
+	}
 
 	@Override
 	public String toString() {
 		return name;
 	}
 
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel out, int flags) {
+		out.writeInt(id);
+		out.writeString(name);
+		out.writeByteArray(picture);
+		out.writeString(pictureSource);
+	}
+	
+    private Image(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        picture = in.createByteArray();
+        pictureSource = in.readString();
+    }
+
+	public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<Image>() {
+		public Image createFromParcel(Parcel in) {
+			return new Image(in);
+		}
+
+		public Image[] newArray(int size) {
+			return new Image[size];
+		}
+	};
 
 }

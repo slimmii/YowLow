@@ -13,6 +13,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -38,6 +39,12 @@ public class DiceKindDialog extends Dialog {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dialog_dicekind);	
+		
+	    ViewGroup.LayoutParams params = getWindow().getAttributes(); 
+	    params.width = ViewGroup.LayoutParams.FILL_PARENT; 
+	    //params.height = LayoutParams.FILL_PARENT; 
+	    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+	    getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);  
 		
 		final ArrayList<DiceKind> kinds = new ArrayList<DiceKind>();
 		final List<Group> groups = mDb.getGroups();

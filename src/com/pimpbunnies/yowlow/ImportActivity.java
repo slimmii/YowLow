@@ -164,7 +164,7 @@ public class ImportActivity extends FacebookActivity {
 			guests.clear();
 
 			// make request to the /me API
-			Request.executeGraphPathRequestAsync(session, "/102909926563430/attending",
+			Request.executeGraphPathRequestAsync(session, "/me/friends",
 					new Callback() {
 				@Override
 				public void onCompleted(Response response) {
@@ -433,6 +433,12 @@ public class ImportActivity extends FacebookActivity {
         }
     }
 
+	public static Intent createIntent(Context context) {
+		Intent i = new Intent(context, ImportActivity.class);
+		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		return i;
+	}
+    
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -530,8 +536,16 @@ public class ImportActivity extends FacebookActivity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				Image image = (Image) arg0.getItemAtPosition(arg2);
-				ImageManageDialog dialog = new ImageManageDialog(ImportActivity.this, image, mDb);
-				dialog.show();
+
+				Intent intent = new Intent(ImportActivity.this,
+						ImageManageActivity.class);
+				
+				Bundle b = new Bundle();
+				b.putParcelable("image", image);
+				b.getParcelable("image");
+				intent.putExtras(b);
+				intent.getExtras();
+				startActivity(intent);
 			}
 
 		});
