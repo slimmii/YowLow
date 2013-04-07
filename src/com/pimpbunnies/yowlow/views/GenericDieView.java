@@ -3,12 +3,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import com.pimpbunnies.yowlow.R;
@@ -29,9 +33,14 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 		mCube = new Cube(getDefaultFaces());		
 		mView = new GLView(mContext, mCube);
 		
+		Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		int width = display.getWidth();
+		
 		android.support.v7.widget.GridLayout.LayoutParams params = new android.support.v7.widget.GridLayout.LayoutParams();
-		params.width = 150;
-		params.height = 150;
+		params.width = (int) width / 3;
+		params.height = (int) width / 3;
+		
+		
 //		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		mView.setLayoutParams(params);
 		
