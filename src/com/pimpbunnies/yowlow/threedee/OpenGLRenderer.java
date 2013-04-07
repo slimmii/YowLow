@@ -16,17 +16,10 @@ public class OpenGLRenderer implements Renderer {
 	/** Cube instance */
 	private Cube cube;	
 	
-	/* Rotation values for all axis */
-	private float xrot;				//X Rotation ( NEW )
-	private float yrot;				//Y Rotation ( NEW )
-	private float zrot;				//Z Rotation ( NEW )
-	
 	/** The Activity Context ( NEW ) */
 	private Context context;
 	
-	private float mSpeed = 0.0f;
 	private boolean mDirty = true;
-	private ShuffleCallback mCb;
 	
 	/**
 	 * Instance the Cube object and set 
@@ -36,11 +29,6 @@ public class OpenGLRenderer implements Renderer {
 		this.context = context;
 		this.cube = cube;
 		mDirty = true;
-	}
-	
-	public void shuffle(ShuffleCallback cb) {
-		mSpeed = 12.9f;
-		mCb = cb;
 	}
 
 	public void setCube(Cube cube) {
@@ -66,7 +54,7 @@ public class OpenGLRenderer implements Renderer {
 	/**
 	 * Here we do our drawing
 	 */
-	public void onDrawFrame(GL10 gl) {
+	public synchronized void onDrawFrame(GL10 gl) {
 		if (mDirty) {
 			if (cube != null) {
 				cube.loadGLTexture(gl, context);
@@ -82,29 +70,8 @@ public class OpenGLRenderer implements Renderer {
 		//Drawing
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);		//Move 5 units into the screen
 		gl.glScalef(1.1f, 1.1f, 1.1f); 			//Scale the Cube to 80 percent, otherwise it would be too large for the screen
-						
-		//Rotate around the axis based on the rotation matrix (rotation, x, y, z)
 		
-		if (cube != null) {
-			gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);	//X
-			gl.glRotatef(yrot, 0.0f, 1.0f, 0.0f);	//Y
-			gl.glRotatef(yrot, 0.0f, 1.0f, 0.0f);	//Y
-			cube.draw(gl);							//Draw the Cube	
-			
-			//Change rotation factors (nice rotation)
-			
-			if (mSpeed > 0) {
-				mSpeed = mSpeed - 0.1f;				
-				xrot += mSpeed;
-				yrot += mSpeed;
-				zrot += mSpeed;
-			} else {
-				if (mCb != null) {
-					mCb.shuffled();
-					mCb = null;
-				}
-			}
-		}
+		cube.draw(gl);
 	}
 
 	/**

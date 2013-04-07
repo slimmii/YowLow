@@ -12,10 +12,6 @@ public class GLView extends GLSurfaceView {
 	private Context mContext;
 	private OpenGLRenderer mRenderer;
 	
-	public void shuffle(ShuffleCallback cb) {
-		mRenderer.shuffle(cb);
-	}
-	
 	public void setCube(Cube cube) {
 		mRenderer.setCube(cube);
 	}

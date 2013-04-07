@@ -2,10 +2,12 @@ package com.pimpbunnies.yowlow;
 
 import java.util.List;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.view.View;
@@ -90,7 +92,7 @@ public class MainActivity extends FacebookActivity {
 		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		return i;
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

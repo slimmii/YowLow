@@ -65,30 +65,30 @@ public class RealDieView extends GenericDieView<Integer> {
 
 	@Override
 	public Integer shuffle(final ShuffleCallback cb) {
-		final Handler handler = new Handler();
-		final Random rand = new Random();
+//		final Handler handler = new Handler();
+//		final Random rand = new Random();
+//
+//		ArrayList<Bitmap> maps = new ArrayList<Bitmap>();
+//		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.one));
+//		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.two));
+//		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.three));
+//		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.four));
+//		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.five));
+//		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.six));
+//
+//		long seed = System.nanoTime();
+//		Collections.shuffle(maps, new Random(seed));
+//		
+//		
+//		fShuffleing = true;
+//		
+//		Bitmap[] bitmaps = new Bitmap[6];
+//		int i = 0;
+//		for (i=0;i<6;i++) {
+//			bitmaps[i] = maps.get(i);
+//		}
 
-		ArrayList<Bitmap> maps = new ArrayList<Bitmap>();
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.one));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.two));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.three));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.four));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.five));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.six));
-
-		long seed = System.nanoTime();
-		Collections.shuffle(maps, new Random(seed));
-		
-		
-		fShuffleing = true;
-		
-		Bitmap[] bitmaps = new Bitmap[6];
-		int i = 0;
-		for (i=0;i<6;i++) {
-			bitmaps[i] = maps.get(i);
-		}
-
-		mView.shuffle(cb);
+		mCube.shuffle(cb);
 		
 		return 0;
 	}

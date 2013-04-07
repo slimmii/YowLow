@@ -77,9 +77,9 @@ public class FacebookDieView extends GenericDieView<Image> {
 	@Override
 	public Image shuffle(final ShuffleCallback cb) {
 		final Handler handler = new Handler();
-
-		mView.setCube(new Cube(getFaces()));
-		mView.shuffle(cb);
+		mCube.setBitmaps(getFaces());
+		mView.setCube(mCube);
+		mCube.shuffle(cb);
 
 
 		return fResult;

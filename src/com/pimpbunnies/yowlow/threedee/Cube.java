@@ -1,29 +1,33 @@
 package com.pimpbunnies.yowlow.threedee;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.List;
+import java.util.Random;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL10Ext;
+import javax.microedition.khronos.opengles.GL11;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
+import android.opengl.Matrix;
 
-import com.pimpbunnies.yowlow.R;
+import com.pimpbunnies.yowlow.views.ShuffleCallback;
 
 public class Cube {
-	
+
 	/** The buffer holding the vertices */
 	private FloatBuffer vertexBuffer;
 	/** The buffer holding the texture coordinates */
 	private FloatBuffer textureBuffer;
 	/** The buffer holding the indices */
 	private ByteBuffer[] indexBuffer = new ByteBuffer[6];
+
+	private ShuffleCallback mCb;
 
 	/** Our texture pointer */
 	private int[] textures = new int[6];
@@ -83,6 +87,8 @@ public class Cube {
 
 	};
 
+	private Matrix normal;
+
 	/** The initial indices definition */
 	private byte indices[][] = {
 			// Faces definition
@@ -99,7 +105,9 @@ public class Cube {
 	 */
 	public Cube(Bitmap[] bitmaps) {
 		mBitmaps = bitmaps;
-		
+
+		normal = new Matrix();
+
 		//
 		ByteBuffer byteBuf = ByteBuffer.allocateDirect(vertices.length * 4);
 		byteBuf.order(ByteOrder.nativeOrder());
@@ -119,6 +127,67 @@ public class Cube {
 			indexBuffer[i].put(indices[i]);
 			indexBuffer[i].position(0);
 		}
+
+		zRot = 0;
+		
+//		Matrix.setIdentityM(matrix, 0);
+//		Matrix.rotateM(matrix, 0, 0, 1.0f, 0.0f, 0.0f);
+//		Matrix.rotateM(matrix, 0, 0, 0.0f, 1.0f, 0.0f);
+//		Matrix.rotateM(matrix, 0, zRot, 0.0f, 0.0f, 1.0f);	
+//		
+//		Matrix.multiplyMV(result, 0, matrix, 0, normals[0], 0);
+//		normals[0] = new float[] {result[0], result[1], result[2],0.0f};
+//		Matrix.multiplyMV(result, 0, matrix, 0, normals[1], 0);		
+//		normals[1] = new float[] {result[0], result[1], result[2],0.0f};		
+//		Matrix.multiplyMV(result, 0, matrix, 0, normals[2], 0);		
+//		normals[2] = new float[] {result[0], result[1], result[2],0.0f};
+	}
+
+	public void setBitmaps(Bitmap[] bitmaps) {
+		mBitmaps = bitmaps;
+	}
+
+	public boolean shuffling = false;
+	private int ignores = 0;
+	public boolean direction;
+
+	public void shuffle(ShuffleCallback cb) {
+		if (shuffling) {
+			shuffling = false;
+		} else {
+			xRot = 0;
+			yRot = 0;
+			zRot = 0;			
+			shuffling = true;
+			ignores = 4 + new Random().nextInt(5);			
+		}
+		mCb = cb;
+		direction = new Random().nextBoolean();
+		ignoreForAWhile = true;
+		System.out.println("RANDOOOOM: " + new Random().nextInt(10));
+	}
+
+	int xRot = 0;
+	int yRot = 0;
+	int zRot = 0;
+	int j = 0;
+	boolean ignoreForAWhile = false;
+	boolean test = false;
+
+	private static final float[] matrix = new float[16];
+	private float[][] normals = new float[][] {
+			{1.0f,0.0f,0.0f,0.0f},
+			{0.0f,1.0f,0.0f,0.0f},
+			{0.0f,0.0f,1.0f,0.0f}
+	};
+
+	private static final float[] xaxis = new float[] { 1.0f, 0.0f, 0.0f, 0.0f };
+	private static final float[] yaxis = new float[] { 0.0f, 1.0f, 0.0f, 0.0f };
+	private static final float[] zaxis = new float[] { 0.0f, 0.0f, 1.0f, 0.0f };
+	private float[] result = new float[4];
+
+	public float dotProduct(float[] a, float[] b) {
+		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 	}
 
 	/**
@@ -128,29 +197,93 @@ public class Cube {
 	 * @param gl
 	 *            - The GL Context
 	 */
-	public void draw(GL10 gl) {
+	public synchronized void draw(GL10 gl) {
+		synchronized (matrix) {
+			gl.glRotatef(10, 1.0f, 0.0f, 1.0f);
+			gl.glRotatef(xRot, 1.0f, 0.0f, 0.0f);
+			gl.glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+			gl.glRotatef(zRot, 0.0f, 0.0f, 1.0f);
+			gl.glRotatef(-10, 1.0f, 0.0f, 1.0f);
+			Matrix.setIdentityM(matrix, 0);
+			Matrix.rotateM(matrix, 0, xRot, 1.0f, 0.0f, 0.0f);
+			Matrix.rotateM(matrix, 0, yRot, 0.0f, 1.0f, 0.0f);
+			Matrix.rotateM(matrix, 0, zRot, 0.0f, 0.0f, 1.0f);
 
-		// Point to our buffers
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			boolean rotate = true;
+			boolean landed = true;
+			if (shuffling) {
+			for (int i = 0; i < 3; i++) {
+				Matrix.multiplyMV(result, 0, matrix, 0, normals[i], 0);
+				float xdot = Math.abs(dotProduct(xaxis, result));
+				float ydot = Math.abs(dotProduct(yaxis, result));
+				float zdot = Math.abs(dotProduct(zaxis, result));
+				if (shuffling) {
+					if ((xdot > 0.99 || xdot < 0.01)
+							&& (ydot > 0.99 || ydot < 0.0001)
+							&& (zdot > 0.99 || zdot < 0.01)) {					
+					} else {				
+						landed = false;
+					}
+				}
+				System.out.println("XDOT[" + i + "]=" + xdot);
+				System.out.println("YDOT[" + i + "]=" + ydot);
+				System.out.println("ZDOT[" + i + "]=" + zdot);				
+			}
+			}
 
-		// Set the face rotation
-		gl.glFrontFace(GL10.GL_CCW);
+			if (shuffling) {
+				if (landed && !ignoreForAWhile) {
+					// We should stop, we've landed!
+					System.out.println("Schtop!;");
+					System.out.println(ignores);
+					if (ignores == 0) {
+						shuffling = false;
+						rotate = false;
+						mCb.shuffled();
+						mCb = null;
+					} else {
+						direction = new Random().nextBoolean();
+						ignores--;
+					}
+				}
+				if (rotate) {
+					ignoreForAWhile = false;
+					if (direction) {
+						xRot = xRot + 15;
+					} else {
+						yRot = yRot + 15;
+					}
+//					zRot = zRot + 10;
+				}			
+			}
+			// Het vectorproduct moet hier 0 zijn!!!
 
-		// Enable the vertex and texture state
-		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+			int[] m = new int[16];
+			gl.glGetIntegerv(gl.GL_MODELVIEW, m, 0);
 
-		for (int i = 0; i < 6; i++) {
-			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[i]);
-			gl.glDrawElements(GL10.GL_TRIANGLES, 6, GL10.GL_UNSIGNED_BYTE,
-					indexBuffer[i]);
+			// Point to our buffers
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+			// Set the face rotation
+			gl.glFrontFace(GL10.GL_CCW);
+
+			// Enable the vertex and texture state
+			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
+			gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+
+			for (int i = 0; i < 6; i++) {
+				gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[i]);
+				gl.glDrawElements(GL10.GL_TRIANGLES, 6, GL10.GL_UNSIGNED_BYTE,
+						indexBuffer[i]);
+			}
+
+
+			
+			// Disable the client state before leaving
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);			
 		}
-
-		// Disable the client state before leaving
-		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-
 	}
 
 	/**
