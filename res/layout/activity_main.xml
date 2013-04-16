@@ -11,13 +11,14 @@
 <ScrollView
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:scrollbarStyle="outsideOverlay"
     android:background="@drawable/app_background" >
  
         <android.support.v7.widget.GridLayout
             android:id="@+id/activity_main_dice_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal"
             android:padding="5dp"
             app:columnCount="2" >
         </android.support.v7.widget.GridLayout>

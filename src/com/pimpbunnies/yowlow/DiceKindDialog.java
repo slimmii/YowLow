@@ -7,6 +7,7 @@ import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Group;
 import com.pimpbunnies.yowlow.views.FacebookDieView;
 import com.pimpbunnies.yowlow.views.RealDieView;
+import com.pimpbunnies.yowlow.views.DoeUBroekUitDieView;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -54,6 +55,12 @@ public class DiceKindDialog extends Dialog {
 				"Just a plain old die", 
 				getContext().getResources().getDrawable(R.drawable.ic_launcher));
 		kinds.add(regular);
+		
+		final DiceKind pantsoff = new DiceKind("Doe u broek uit", 
+				"Based on the Doe U Broek uit die", 
+				getContext().getResources().getDrawable(R.drawable.ic_launcher));
+		kinds.add(pantsoff);
+		
 		for (Group group : groups) {
 			kinds.add(new DiceKind(group.getName(),
 					"Customized dice", 
@@ -73,11 +80,14 @@ public class DiceKindDialog extends Dialog {
 				if (mListview.getSelectedItem() == regular) {					
 					mMainActivity.addNewDie(new RealDieView(mMainActivity));
 				}
+				if (mListview.getSelectedItem() == pantsoff) {					
+					mMainActivity.addNewDie(new DoeUBroekUitDieView(mMainActivity));
+				}				
 				
-				for (int i=1; i<kinds.size();i++) {
+				for (int i=2; i<kinds.size();i++) {
 					DiceKind kind = kinds.get(i);
 					if (mListview.getSelectedItem() == kind) {
-						FacebookDieView facebook = new FacebookDieView(mMainActivity, groups.get(i-1));
+						FacebookDieView facebook = new FacebookDieView(mMainActivity, groups.get(i-2));
 						mMainActivity.addNewDie(facebook);
 					}	
 				}

@@ -37,8 +37,8 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 		int width = display.getWidth();
 		
 		android.support.v7.widget.GridLayout.LayoutParams params = new android.support.v7.widget.GridLayout.LayoutParams();
-		params.width = (int) width / 3;
-		params.height = (int) width / 3;
+		params.width = (int) (width / 2.5);
+		params.height = (int) (width / 2.5);
 		
 		
 //		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);

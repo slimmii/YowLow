@@ -20,6 +20,7 @@ import com.pimpbunnies.yowlow.model.Group;
 import com.pimpbunnies.yowlow.model.Image;
 import com.pimpbunnies.yowlow.ui.DeviceShaked;
 import com.pimpbunnies.yowlow.ui.Shaker;
+import com.pimpbunnies.yowlow.views.DoeUBroekUitDieView;
 import com.pimpbunnies.yowlow.views.FacebookDieView;
 import com.pimpbunnies.yowlow.views.GenericDieView;
 import com.pimpbunnies.yowlow.views.RealDieView;
@@ -52,6 +53,8 @@ public class MainActivity extends FacebookActivity {
 					((FacebookDieView) v).shuffle(shuffle);
 				} else if (v instanceof RealDieView) {
 					((RealDieView) v).shuffle(shuffle);
+				} else if (v instanceof DoeUBroekUitDieView) {
+					((DoeUBroekUitDieView) v).shuffle(shuffle);
 				}
 			}
 

@@ -139,7 +139,7 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 	public void removeImageFromGroup(Image image, Group group) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String[] ids = {String.valueOf(image.getId()), String.valueOf(group.getId())};
-		db.delete("rows" , KEY_IMAGE_FOREIGN_ID + "=? AND " + KEY_GROUP_FOREIGN_ID +"=?" , ids );
+		db.delete(TABLE_IMAGES_GROUPS , KEY_IMAGE_FOREIGN_ID + "=? AND " + KEY_GROUP_FOREIGN_ID +"=?" , ids );
 		db.close();
 	}
 

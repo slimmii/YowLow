@@ -37,7 +37,7 @@ public class ImageManageActivity extends Activity {
 		
 	private ImageButton dialog_imagemanage_add_button;
 	private EditText dialog_imagemanage_groupname_text;
-	private Button dialog_imagemanage_groupname_add_button;
+	private Button activity_imagemanage_addNewDie;
 	
 	public ImageManageActivity() {	
 	}
@@ -65,30 +65,35 @@ public class ImageManageActivity extends Activity {
 		activity_imagemanage_name = (TextView) findViewById(R.id.activity_imagemanage_name);
 		activity_imagemanage_name.setText(mImage.getName());
 
-		dialog_imagemanage_groupname_text = (EditText) findViewById(R.id.dialog_imagemanage_groupname_text);
-		dialog_imagemanage_groupname_add_button = (Button) findViewById(R.id.dialog_imagemanage_groupname_add_button);
-		dialog_imagemanage_groupname_add_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Group group = new Group(dialog_imagemanage_groupname_text.getText().toString());
-				mDb.createGroup(group);
-				mGroups.add(group);
-				mGroups.notifyDataSetChanged();
-			}
-		});
+//		activity_imagemanage_addNewDie = (Button) findViewById(R.id.activity_imagemanage_addNewDie);
+//		activity_imagemanage_addNewDie.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				/*
+//				Group group = new Group(dialog_imagemanage_groupname_text.getText().toString());
+//				mDb.createGroup(group);
+//				mGroups.add(group);
+//				mGroups.notifyDataSetChanged();
+//				*/
+//			}
+//		});
 		
 		mGroups = new ImageManageArrayAdapter(this, mDb.getGroups(), mDb);		
 		mListview = (ListView) findViewById(R.id.activity_imagemanage_list);
 		mListview.setAdapter(mGroups);
-		mListview.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				Group group = (Group) arg0.getItemAtPosition(arg2);
-				mDb.addImageToGroup(mImage, group);
-				mGroups.notifyDataSetChanged();
-			}
-		});
+	}
+	
+	public void addImageToGroup(Group g) {
+		System.out.println("CLIIIIIICK");
+		mDb.addImageToGroup(mImage, g);
+		mGroups.notifyDataSetChanged();
+	}
+	
+	public void removeImageFromGroup(Group g) {
+		System.out.println("Removing " + mImage.getName() + " from " + g.getName());
+		
+		mDb.removeImageFromGroup(mImage, g);
+		mGroups.notifyDataSetChanged();
 	}
 	
 	

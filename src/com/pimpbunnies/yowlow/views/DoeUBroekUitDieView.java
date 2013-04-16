@@ -21,7 +21,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.view.View;
 
-public class RealDieView extends GenericDieView<Integer> {
+public class DoeUBroekUitDieView extends GenericDieView<Integer> {
 
 	private int fCounter = 0;
 	private int fCurrentNumber = 6;
@@ -41,12 +41,12 @@ public class RealDieView extends GenericDieView<Integer> {
 
 	public Bitmap[] getFaces() {
 		ArrayList<Bitmap> maps = new ArrayList<Bitmap>();
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.one));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.two));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.three));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.four));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.five));
-		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.six));
+		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.beer));
+		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.pantsdown));
+		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.dance));
+		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.shot));
+		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.nothing));
+		maps.add(BitmapFactory.decodeResource(getResources(), R.drawable.sing));
 
 		long seed = System.nanoTime();
 		Collections.shuffle(maps, new Random(seed));
@@ -58,7 +58,7 @@ public class RealDieView extends GenericDieView<Integer> {
 		return bm;
 	}
 
-	public RealDieView(Context context) {
+	public DoeUBroekUitDieView(Context context) {
 		super(context);
 		mContext = context;
 	}
