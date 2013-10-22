@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.pimpbunnies.yowlow.MainActivity;
 import com.pimpbunnies.yowlow.R;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Image;
@@ -58,7 +59,7 @@ public class RealDieView extends GenericDieView<Integer> {
 		return bm;
 	}
 
-	public RealDieView(Context context) {
+	public RealDieView(MainActivity context) {
 		super(context);
 		mContext = context;
 	}

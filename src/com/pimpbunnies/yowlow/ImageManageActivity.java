@@ -1,14 +1,14 @@
 package com.pimpbunnies.yowlow;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -42,6 +42,26 @@ public class ImageManageActivity extends Activity {
 	public ImageManageActivity() {	
 	}
 	
+	public void addGroupName(DialogInterface.OnClickListener listener) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Title");
+
+		// Set up the input
+		dialog_imagemanage_groupname_text = new EditText(this);
+		dialog_imagemanage_groupname_text.setInputType(InputType.TYPE_CLASS_TEXT);
+		builder.setView(dialog_imagemanage_groupname_text);
+
+		// Set up the buttons
+		builder.setPositiveButton("OK", listener);
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        dialog.cancel();
+		    }
+		});
+		builder.show();
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,18 +85,21 @@ public class ImageManageActivity extends Activity {
 		activity_imagemanage_name = (TextView) findViewById(R.id.activity_imagemanage_name);
 		activity_imagemanage_name.setText(mImage.getName());
 
-//		activity_imagemanage_addNewDie = (Button) findViewById(R.id.activity_imagemanage_addNewDie);
-//		activity_imagemanage_addNewDie.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				/*
-//				Group group = new Group(dialog_imagemanage_groupname_text.getText().toString());
-//				mDb.createGroup(group);
-//				mGroups.add(group);
-//				mGroups.notifyDataSetChanged();
-//				*/
-//			}
-//		});
+		activity_imagemanage_addNewDie = (Button) findViewById(R.id.activity_imagemanage_addNewDie);
+		activity_imagemanage_addNewDie.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				addGroupName(new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Group group = new Group(dialog_imagemanage_groupname_text.getText().toString());
+						mDb.createGroup(group);
+						mGroups.add(group);
+						mGroups.notifyDataSetChanged();						
+					}
+				});
+			}
+		});
 		
 		mGroups = new ImageManageArrayAdapter(this, mDb.getGroups(), mDb);		
 		mListview = (ListView) findViewById(R.id.activity_imagemanage_list);
@@ -93,6 +116,12 @@ public class ImageManageActivity extends Activity {
 		System.out.println("Removing " + mImage.getName() + " from " + g.getName());
 		
 		mDb.removeImageFromGroup(mImage, g);
+		mGroups.notifyDataSetChanged();
+	}
+
+	public void removeGroup(Group g) {
+		mDb.removeGroup(g);
+		mGroups.remove(g);
 		mGroups.notifyDataSetChanged();
 	}
 	

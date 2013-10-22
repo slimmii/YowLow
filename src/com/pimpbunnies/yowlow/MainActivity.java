@@ -1,13 +1,9 @@
 package com.pimpbunnies.yowlow;
 
-import java.util.List;
-
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.view.View;
@@ -16,8 +12,6 @@ import com.facebook.FacebookActivity;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.AbstractAction;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
-import com.pimpbunnies.yowlow.model.Group;
-import com.pimpbunnies.yowlow.model.Image;
 import com.pimpbunnies.yowlow.ui.DeviceShaked;
 import com.pimpbunnies.yowlow.ui.Shaker;
 import com.pimpbunnies.yowlow.views.DoeUBroekUitDieView;
@@ -27,8 +21,9 @@ import com.pimpbunnies.yowlow.views.RealDieView;
 import com.pimpbunnies.yowlow.views.ShuffleCallback;
 
 public class MainActivity extends FacebookActivity {
-
+	
 	private GridLayout fDiceView;
+	private AbstractAction mDeleteAction;
 	private BirthdaySQLiteHelper mDb;
 	private boolean fRollingAllDice = false;
 
@@ -89,6 +84,10 @@ public class MainActivity extends FacebookActivity {
 	public void addNewDie(GenericDieView die) {
 		fDiceView.addView(die);
 	}
+	
+	public void removeDie(GenericDieView die) {
+		fDiceView.removeView(die);
+	}
 
 	public static Intent createIntent(Context context) {
 		Intent i = new Intent(context, MainActivity.class);
@@ -104,6 +103,7 @@ public class MainActivity extends FacebookActivity {
 		
 		mDb = new BirthdaySQLiteHelper(this);
 
+		mDeleteAction = new DeleteDiceAction();
 		final ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
 		// actionBar.setHomeAction(new IntentAction(this, createIntent(this),
 		// R.drawable.ic_title_home_demo));
@@ -112,6 +112,7 @@ public class MainActivity extends FacebookActivity {
 		actionBar.addAction(new ImportAction());
 		actionBar.addAction(new AddDiceAction());
 		actionBar.addAction(new ThrowDiceAction());
+		actionBar.addAction(mDeleteAction);
 
 		Shaker shaker = new Shaker(this, new DeviceShaked() {
 			@Override
@@ -133,6 +134,40 @@ public class MainActivity extends FacebookActivity {
 		public void performAction(View view) {
 			DiceKindDialog dialog = new DiceKindDialog(MainActivity.this, mDb);
 			dialog.show();
+		}
+
+	}
+	
+	private class DeleteOffDiceAction extends AbstractAction {
+
+		public DeleteOffDiceAction() {
+			super(R.drawable.ic_deletedice_selected);
+		}
+
+		@Override
+		public void performAction(View view) {
+			final ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
+			actionBar.removeAction(mDeleteAction);
+			mDeleteAction = new DeleteDiceAction();
+			actionBar.addAction(mDeleteAction);
+			YowLowApplication.getInstance().toggleDelete();
+		}
+
+	}
+	
+	private class DeleteDiceAction extends AbstractAction {
+
+		public DeleteDiceAction() {
+			super(R.drawable.ic_deletedice);
+		}
+
+		@Override
+		public void performAction(View view) {
+			final ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
+			actionBar.removeAction(mDeleteAction);
+			mDeleteAction = new DeleteOffDiceAction();
+			actionBar.addAction(mDeleteAction);
+			YowLowApplication.getInstance().toggleDelete();
 		}
 
 	}
@@ -164,6 +199,7 @@ public class MainActivity extends FacebookActivity {
 		}
 
 	}	
+	
 	
 	
 

@@ -143,6 +143,14 @@ public class BirthdaySQLiteHelper extends SQLiteOpenHelper {
 		db.close();
 	}
 
+
+	public void removeGroup(Group g) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String[] ids = {String.valueOf(g.getId())};
+		db.delete(TABLE_GROUPS , KEY_GROUP_ID + "=?" , ids );
+		db.close();	
+	}
+
 	public List<Group> getGroups() {
 		List<Group> groupList = new ArrayList<Group>();
 		// Select All Query

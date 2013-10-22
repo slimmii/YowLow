@@ -397,8 +397,8 @@ public class ImportActivity extends FacebookActivity {
 					// Set an EditText view to get user input 
 					final EditText input = new EditText(this);
 					new AlertDialog.Builder(ImportActivity.this)
-				    .setTitle("Enter ")
-				    .setMessage("ZOMGS")
+				    .setTitle("Enter name")
+				    .setMessage("Enter a name")
 				    .setView(input)
 				    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 				        public void onClick(DialogInterface dialog, int whichButton) {

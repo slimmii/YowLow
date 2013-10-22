@@ -56,10 +56,10 @@ public class DiceKindDialog extends Dialog {
 				getContext().getResources().getDrawable(R.drawable.ic_launcher));
 		kinds.add(regular);
 		
-		final DiceKind pantsoff = new DiceKind("Doe u broek uit", 
-				"Based on the Doe U Broek uit die", 
-				getContext().getResources().getDrawable(R.drawable.ic_launcher));
-		kinds.add(pantsoff);
+//		final DiceKind pantsoff = new DiceKind("Doe u broek uit", 
+//				"Based on the Doe U Broek uit die", 
+//				getContext().getResources().getDrawable(R.drawable.ic_launcher));
+//		kinds.add(pantsoff);
 		
 		for (Group group : groups) {
 			kinds.add(new DiceKind(group.getName(),
@@ -80,14 +80,14 @@ public class DiceKindDialog extends Dialog {
 				if (mListview.getSelectedItem() == regular) {					
 					mMainActivity.addNewDie(new RealDieView(mMainActivity));
 				}
-				if (mListview.getSelectedItem() == pantsoff) {					
-					mMainActivity.addNewDie(new DoeUBroekUitDieView(mMainActivity));
-				}				
+//				if (mListview.getSelectedItem() == pantsoff) {					
+//					mMainActivity.addNewDie(new DoeUBroekUitDieView(mMainActivity));
+//				}				
 				
-				for (int i=2; i<kinds.size();i++) {
+				for (int i=1; i<kinds.size();i++) {
 					DiceKind kind = kinds.get(i);
 					if (mListview.getSelectedItem() == kind) {
-						FacebookDieView facebook = new FacebookDieView(mMainActivity, groups.get(i-2));
+						FacebookDieView facebook = new FacebookDieView(mMainActivity, groups.get(i-1));
 						mMainActivity.addNewDie(facebook);
 					}	
 				}

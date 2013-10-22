@@ -15,7 +15,9 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import com.pimpbunnies.yowlow.MainActivity;
 import com.pimpbunnies.yowlow.R;
+import com.pimpbunnies.yowlow.YowLowApplication;
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.threedee.Cube;
 import com.pimpbunnies.yowlow.threedee.GLView;
@@ -25,9 +27,9 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 	
 	protected Cube mCube;
 	
-	private Context mContext;
+	private MainActivity mContext;
 	
-	public GenericDieView(Context context) {
+	public GenericDieView(MainActivity context) {
 		super(context);
 		mContext = context;
 		mCube = new Cube(getDefaultFaces());		
@@ -72,7 +74,11 @@ public abstract class GenericDieView<T> extends LinearLayout implements OnTouchL
 	
 	@Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-		shuffle();
+		if (YowLowApplication.getInstance().isDeleting()) {
+			mContext.removeDie(this);
+		} else {
+			shuffle();
+		}
  		return false;
     }
 }

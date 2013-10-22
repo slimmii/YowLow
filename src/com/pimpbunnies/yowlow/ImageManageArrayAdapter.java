@@ -11,6 +11,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -18,6 +19,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pimpbunnies.yowlow.databse.BirthdaySQLiteHelper;
 import com.pimpbunnies.yowlow.model.Group;
@@ -58,6 +60,13 @@ public class ImageManageArrayAdapter extends ArrayAdapter<Group> {
 	    final Group g = groups.get(position);
 	    holder.text.setText(g.getName());
 	    holder.grid.removeAllViews();
+	    holder.deletebutton.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				context.removeGroup(g);
+				return true;
+			}
+		});
 	    holder.deletebutton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
